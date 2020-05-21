@@ -1,0 +1,39 @@
+apply plugin: 'maven'
+ext {
+    //maven仓库路径
+    GITHUB_REPO_PATH = "/Users/allens/Documents/maven/"
+    //group
+    PUBLISH_GROUP_ID = 'com.allens'
+    //包名
+    PUBLISH_ARTIFACT_ID = 'http2'
+    //版本
+    PUBLISH_VERSION = '1.0.0'
+
+
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            //本地maven仓库地址,也可以使用远程maven仓库
+            def deployPath = file(project.GITHUB_REPO_PATH)
+            repository(url: "file://${deployPath.absolutePath}")
+            pom.project {
+                groupId project.PUBLISH_GROUP_ID
+                artifactId project.PUBLISH_ARTIFACT_ID
+                version project.PUBLISH_VERSION
+            }
+        }
+    }
+}
+
+
+// 源代码一起打包
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.sourceFiles
+}
+
+artifacts {
+    archives androidSourcesJar
+}

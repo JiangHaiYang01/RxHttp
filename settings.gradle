@@ -1,0 +1,2 @@
+rootProject.name='RxHttp'
+include ':app', ':lib_http-coroutine'

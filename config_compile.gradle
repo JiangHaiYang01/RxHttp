@@ -1,0 +1,162 @@
+apply plugin: 'kotlin-kapt'
+ext {
+    android {
+        //编译的SDK版本
+        compileSdkVersion 29
+        //编译的Tools版本
+        buildToolsVersion "29.0.2"
+
+        //==========================================================================================
+        // 默认配置
+        //==========================================================================================
+        defaultConfig {
+            //支持的最低版本
+            minSdkVersion 21
+            //支持的目标版本
+            targetSdkVersion 29
+            //版本号
+            versionCode 1
+            //版本名称
+            versionName "1.0"
+
+            testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+
+            //开启 Dex 分包
+            multiDexEnabled true
+
+        }
+        //==========================================================================================
+        //   other configuration (buildTypes, defaultConfig, etc.)
+        //   在该packagingOptions块内添加该块，android以将原子函数模块从包中排除，并防止出现警告。
+        //==========================================================================================
+        packagingOptions {
+            exclude 'META-INF/atomicfu.kotlin_module'
+        }
+
+        //==========================================================================================
+        // 启用 DataBinding
+        //==========================================================================================
+        dataBinding {
+            enabled = true
+        }
+
+        //==========================================================================================
+        // 启用 viewBinding
+        //==========================================================================================
+        viewBinding {
+            enabled = true
+        }
+
+        //==========================================================================================
+        // 出现错误不终止编译
+        //==========================================================================================
+        lintOptions {
+            abortOnError false
+        }
+
+        //==========================================================================================
+        // 使用 httpclient （7.0之前使用的网络请求非HttpURLClient）
+        //==========================================================================================
+        useLibrary 'org.apache.http.legacy'
+
+
+        //==========================================================================================
+        // 支持java 8
+        //==========================================================================================
+        compileOptions {
+            sourceCompatibility JavaVersion.VERSION_1_8
+            targetCompatibility JavaVersion.VERSION_1_8
+        }
+
+        //==========================================================================================
+        // Cannot inline bytecode built with JVM target 1.8
+        // into bytecode that is being built with JVM target 1.6
+        //==========================================================================================
+        kotlinOptions {
+            jvmTarget = "1.8"
+        }
+
+
+        //==============================================================================================
+        // dex 配置
+        //==============================================================================================
+        dexOptions {
+            jumboMode true
+            dexInProcess true
+            //是否预索引库。这可以改善增量构建，但是干净的构建可能会更慢。
+            preDexLibraries true
+            //指定-Xmx调用dx时的值。示例值为"2048m"。
+            javaMaxHeapSize "4g"
+            //可用于dex的最大并发进程数。默认为4
+            maxProcessCount 6
+            //运行dx时要使用的线程数。默认为4
+            threadCount 4
+            //将所有带有运行时注释的类保留在旧版multidex中的主dex中。
+            keepRuntimeAnnotatedClasses false
+        }
+
+
+        //==========================================================================================
+        // 源文件路径设置
+        //==========================================================================================
+        sourceSets {
+            main {
+                //java 代码路径
+                java.srcDirs = [
+                        'src/main/java',                            //Java
+                        'src/main/kotlin'                           //Kotlin
+                ]
+
+
+                //资源路径 当需要将layout 进行分包时候可以进行配置 eg  'src/main/res/layout/activity',
+                res.srcDirs =
+                        [
+                                'src/main/res'
+                        ]
+
+                //jni 路径
+                jniLibs.srcDirs = [
+                        'libs',
+                        'jniLibs'
+                ]
+            }
+        }
+
+
+        //==========================================================================================
+        // 当引入的其他model下的jar 或者 aar  时候 需要配置
+        // eg: '../component_audio_conversion/libs',
+        //==========================================================================================
+        //使用libs 下面的依赖
+        repositories {
+            flatDir {
+                dirs 'libs'
+            }
+        }
+
+
+        //==========================================================================================
+        // lib 模块是否开启自定义的混淆
+        //==========================================================================================
+        buildTypes {
+            release {
+                minifyEnabled true
+                proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            }
+        }
+
+    }
+
+
+    dependencies {
+        implementation fileTree(dir: 'libs', include: ['*.jar'])
+        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+        implementation 'androidx.appcompat:appcompat:1.1.0'
+        implementation 'androidx.core:core-ktx:1.2.0'
+        testImplementation 'junit:junit:4.12'
+        androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+        androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    }
+
+}

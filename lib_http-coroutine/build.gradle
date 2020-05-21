@@ -1,0 +1,9 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+
+//本地依赖
+apply from: 'config.gradle'
+//编译配置
+apply from: '../config_compile.gradle'
