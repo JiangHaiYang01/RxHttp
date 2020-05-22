@@ -5,10 +5,7 @@ import com.allens.lib_http2.config.*
 import com.allens.lib_http2.core.HttpResult
 import com.allens.lib_http2.download.DownLoadManager
 import com.allens.lib_http2.download.utils.FileTool
-import com.allens.lib_http2.impl.OnCookieInterceptor
-import com.allens.lib_http2.impl.OnDownLoadListener
-import com.allens.lib_http2.impl.OnHeardListener
-import com.allens.lib_http2.impl.OnLogFilterListener
+import com.allens.lib_http2.impl.*
 import com.allens.lib_http2.interceptor.OnCookieListener
 import com.allens.lib_http2.manager.HttpManager
 import com.allens.lib_http2.tools.RequestBuilder
@@ -63,6 +60,11 @@ class RxHttp {
 
         fun addLogFilter(listener: OnLogFilterListener): Builder {
             HttpConfig.logFilterListener = listener
+            return this
+        }
+
+        fun addLogListener(logListener: OnLogListener): Builder {
+            HttpConfig.logListener = logListener
             return this
         }
 
@@ -149,7 +151,6 @@ class RxHttp {
     fun create(): RequestBuilder {
         return RequestBuilder()
     }
-
 
 
     inline fun <T : Any> checkResult(

@@ -10,3 +10,8 @@ package com.allens.lib_http2.impl
 interface OnLogFilterListener {
     fun filter(message: String): Boolean
 }
+
+
+interface OnLogListener{
+    fun onRxHttpLog(message: String);
+}
