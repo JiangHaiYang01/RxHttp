@@ -4,6 +4,7 @@ import android.util.Log
 import com.allens.lib_http2.RxHttp
 import com.allens.lib_http2.config.HttpConfig
 import com.allens.lib_http2.config.HttpLevel
+import com.allens.lib_http2.tools.RxHttpLogTool
 import okhttp3.logging.HttpLoggingInterceptor
 
 /**
@@ -25,7 +26,7 @@ object LogInterceptor {
                         return
                     }
                 }
-                Log.i(RxHttp.TAG, "http----> $message ")
+                RxHttpLogTool.i(RxHttp.TAG, "http----> $message ")
             }
         })
         interceptor.level = HttpLevel.conversion(level)

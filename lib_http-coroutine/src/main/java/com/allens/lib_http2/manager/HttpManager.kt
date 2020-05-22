@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit
 object HttpManager {
 
 
-     lateinit var context: Context
+    lateinit var context: Context
 
     fun create(): HttpManager {
         createBuilder()
@@ -130,7 +130,7 @@ object HttpManager {
 
     fun <T> getService(tClass: Class<T>): T {
         val t = retrofit.create(tClass)
-        retrofit = createRetrofit()
+//        retrofit = createRetrofit()
         return t
     }
 

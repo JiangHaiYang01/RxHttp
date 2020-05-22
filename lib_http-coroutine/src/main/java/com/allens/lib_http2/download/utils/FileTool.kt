@@ -4,6 +4,7 @@ import android.util.Log
 import com.allens.lib_http2.RxHttp
 import com.allens.lib_http2.config.HttpConfig
 import com.allens.lib_http2.impl.OnDownLoadListener
+import com.allens.lib_http2.tools.RxHttpLogTool
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
@@ -38,7 +39,7 @@ object FileTool {
         try {
             if (filePath == null) {
                 if (HttpConfig.isLog)
-                    Log.i(TAG, "mkdirs file [$savePath]  error")
+                    RxHttpLogTool.i(TAG, "mkdirs file [$savePath]  error")
                 withContext(Dispatchers.Main) {
                     loadListener.onDownLoadError(key, Throwable("mkdirs file [$savePath]  error"))
                 }

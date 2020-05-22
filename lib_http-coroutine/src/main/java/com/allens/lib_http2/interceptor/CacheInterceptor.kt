@@ -6,6 +6,7 @@ import android.util.Log
 import com.allens.lib_http2.RxHttp
 import com.allens.lib_http2.config.HttpCacheType
 import com.allens.lib_http2.config.HttpConfig
+import com.allens.lib_http2.tools.RxHttpLogTool
 import okhttp3.CacheControl
 import okhttp3.Interceptor
 import okhttp3.Request
@@ -33,7 +34,7 @@ internal class CacheInterceptor(private val context: Context) : Interceptor {
                     0
                 }
             }
-            Log.i(
+            RxHttpLogTool.i(
                 RxHttp.TAG,
                 "http---->  无网络 离线缓存 " + if (time != HttpConfig.cacheNoNetworkTimeOut) {
                     "无限时请求有网请求好的数据"

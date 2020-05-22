@@ -4,6 +4,7 @@ import android.util.Log
 import com.allens.lib_http2.RxHttp
 import com.allens.lib_http2.config.HttpConfig
 import com.allens.lib_http2.config.HttpNetWorkType
+import com.allens.lib_http2.tools.RxHttpLogTool
 import okhttp3.Interceptor
 import okhttp3.Response
 
@@ -33,7 +34,7 @@ internal class CacheNetworkInterceptor : Interceptor {
                 0
             }
         }
-        Log.i(
+        RxHttpLogTool.i(
             RxHttp.TAG,
             "http---->  addNetworkInterceptor " + if (time == 0) {
                 "每次都请求实时数据"

@@ -10,6 +10,7 @@ import com.allens.lib_http2.download.utils.ShareDownLoadUtil
 import com.allens.lib_http2.impl.ApiService
 import com.allens.lib_http2.impl.OnDownLoadListener
 import com.allens.lib_http2.manager.HttpManager
+import com.allens.lib_http2.tools.RxHttpLogTool
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
@@ -78,16 +79,16 @@ object DownLoadManager {
         val scope = DownLoadPool.getScopeFromKey(tag)
         if (scope != null && scope.isActive) {
             if (HttpConfig.isLog)
-                Log.i(TAG, "key $tag 已经在队列中")
+                RxHttpLogTool.i(TAG, "key $tag 已经在队列中")
             return
         } else if (scope != null && !scope.isActive) {
             if (HttpConfig.isLog)
-                Log.i(TAG, "key $tag 已经在队列中 但是已经不再活跃 remove")
+                RxHttpLogTool.i(TAG, "key $tag 已经在队列中 但是已经不再活跃 remove")
             DownLoadPool.removeExitSp(tag)
         }
 
         if (HttpConfig.isLog) {
-            Log.i(TAG, "startDownLoad key: $tag  url:$url  savePath: $savePath  saveName:$saveName")
+            RxHttpLogTool.i(TAG, "startDownLoad key: $tag  url:$url  savePath: $savePath  saveName:$saveName")
         }
 
         if (saveName.isEmpty()) {
@@ -111,12 +112,12 @@ object DownLoadManager {
             ShareDownLoadUtil.getLong(tag, 0)
         }
         if (HttpConfig.isLog) {
-            Log.i(TAG, "startDownLoad current $currentLength")
+            RxHttpLogTool.i(TAG, "startDownLoad current $currentLength")
         }
 
         try {
             if (HttpConfig.isLog) {
-                Log.i(TAG, "add pool")
+                RxHttpLogTool.i(TAG, "add pool")
             }
             //添加到pool
             DownLoadPool.add(tag, coroutineScope)
@@ -132,7 +133,7 @@ object DownLoadManager {
             val responseBody = response.body()
             if (responseBody == null) {
                 if (HttpConfig.isLog) {
-                    Log.i(TAG, "responseBody is null")
+                    RxHttpLogTool.i(TAG, "responseBody is null")
                     withContext(Dispatchers.Main) {
                         loadListener.onDownLoadError(
                             key = tag,
