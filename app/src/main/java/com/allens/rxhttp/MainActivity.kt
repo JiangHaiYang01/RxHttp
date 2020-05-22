@@ -39,6 +39,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         btn_download.setOnClickListener {
             startActivity(Intent(this, DownLoadAct::class.java))
         }
+        btn_upload.setOnClickListener {
+            startActivity(Intent(this, UploadAct::class.java))
+        }
     }
 
     private fun postRequest() {

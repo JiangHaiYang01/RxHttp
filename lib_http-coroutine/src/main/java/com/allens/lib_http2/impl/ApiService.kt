@@ -67,13 +67,11 @@ interface ApiService {
 
 
     @Multipart
-    @POST("{path}")
+    @POST
     fun upload(
-        @Path(
-            value = "path",
-            encoded = true
-        ) urlPath: String,
+        @Url url: String,
         @HeaderMap headers: HashMap<String, String>,
+        @QueryMap maps: Map<String, Any>,
         @PartMap map: Map<String, RequestBody>
     ): Response<ResponseBody>
 

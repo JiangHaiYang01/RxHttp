@@ -86,10 +86,10 @@ class DownLoadAct : AppCompatActivity(), CoroutineScope by MainScope(),
                 }
             }
             2 -> {
-                rxHttp.doDownLoadPauseAll()
+                rxHttp.create().doDownLoadPauseAll()
             }
             3 -> {
-                rxHttp.doDownLoadCancelAll()
+                rxHttp.create().doDownLoadCancelAll()
             }
 
         }
@@ -111,11 +111,11 @@ class DownLoadAct : AppCompatActivity(), CoroutineScope by MainScope(),
     }
 
     private suspend fun startDownLoad(info: DownLoadInfo) {
-        rxHttp.doDownLoad(info.taskId, info.url, getBasePath(this), info.saveName, this)
+        rxHttp.create().doDownLoad(info.taskId, info.url, getBasePath(this), info.saveName, this)
     }
 
     private fun pauseDownLoad(info: DownLoadInfo) {
-        rxHttp.doDownLoadPause(info.taskId)
+        rxHttp.create().doDownLoadPause(info.taskId)
     }
 
     override fun onDownLoadPrepare(key: String) {
@@ -165,7 +165,7 @@ class DownLoadAct : AppCompatActivity(), CoroutineScope by MainScope(),
 
     override fun onDestroy() {
         super.onDestroy()
-        rxHttp.doDownLoadPauseAll()
+        rxHttp.create().doDownLoadPauseAll()
     }
 
 

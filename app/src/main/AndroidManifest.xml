@@ -21,6 +21,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".DownLoadAct" />
+        <activity android:name=".UploadAct" />
     </application>
 
 

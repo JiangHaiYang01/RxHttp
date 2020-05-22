@@ -1,7 +1,9 @@
 package com.allens.lib_http2.tools
 
 import com.allens.lib_http2.core.HttpResult
+import com.allens.lib_http2.download.DownLoadManager
 import com.allens.lib_http2.impl.ApiService
+import com.allens.lib_http2.impl.OnDownLoadListener
 import com.allens.lib_http2.manager.HttpManager
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
@@ -27,8 +29,9 @@ class RequestBuilder {
     }
 
 
-    fun addRequestBody(key: String, path: String): RequestBuilder {
-        val fileBody: RequestBody = RequestBody.create("multipart/form-data".toMediaTypeOrNull(), File(path))
+    fun addFile(key: String, file: File): RequestBuilder {
+        val fileBody: RequestBody =
+            RequestBody.create("multipart/form-data".toMediaTypeOrNull(), file)
         bodyMap[key] = fileBody
         return this
     }
@@ -95,10 +98,10 @@ class RequestBuilder {
     }
 
 
-    suspend fun <T : Any> doUpload(parameter: String, tClass: Class<T>): HttpResult<T> {
+    suspend fun <T : Any> doUpload(url: String, tClass: Class<T>): HttpResult<T> {
         return executeResponse({
             HttpManager.getService(ApiService::class.java)
-                .upload(parameter, heard, bodyMap).body()
+                .upload(url = url, headers = heard, maps = map, map = bodyMap).body()
                 ?.string()
         }, tClass)
     }
@@ -112,6 +115,41 @@ class RequestBuilder {
         } catch (e: Throwable) {
             HttpResult.Error(e)
         }
+    }
+
+
+    //下载
+    suspend fun doDownLoad(
+        tag: String,
+        url: String,
+        savePath: String,
+        saveName: String,
+        loadListener: OnDownLoadListener
+    ) {
+        DownLoadManager.downLoad(
+            tag, url, savePath, saveName, loadListener = loadListener
+        )
+    }
+
+
+    //下载 cancel
+    fun doDownLoadCancel(key: String) {
+        DownLoadManager.cancel(key)
+    }
+
+    //暂停下载
+    fun doDownLoadPause(key: String) {
+        DownLoadManager.pause(key)
+    }
+
+    //暂停所有下载
+    fun doDownLoadPauseAll() {
+        DownLoadManager.doDownLoadPauseAll()
+    }
+
+    //取消所有下载
+    fun doDownLoadCancelAll() {
+        DownLoadManager.doDownLoadCancelAll()
     }
 
 

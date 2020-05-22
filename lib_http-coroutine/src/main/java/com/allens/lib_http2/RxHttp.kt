@@ -151,39 +151,6 @@ class RxHttp {
     }
 
 
-    //下载
-    suspend fun doDownLoad(
-        tag: String,
-        url: String,
-        savePath: String,
-        saveName: String,
-        loadListener: OnDownLoadListener
-    ) {
-        DownLoadManager.downLoad(
-            tag, url, savePath, saveName, loadListener = loadListener
-        )
-    }
-
-
-    //下载 cancel
-    fun doDownLoadCancel(key: String) {
-        DownLoadManager.cancel(key)
-    }
-
-    //暂停下载
-    fun doDownLoadPause(key: String) {
-        DownLoadManager.pause(key)
-    }
-
-    //暂停所有下载
-    fun doDownLoadPauseAll() {
-        DownLoadManager.doDownLoadPauseAll()
-    }
-
-    //取消所有下载
-    fun doDownLoadCancelAll() {
-        DownLoadManager.doDownLoadCancelAll()
-    }
 
     inline fun <T : Any> checkResult(
         result: HttpResult<T>,
