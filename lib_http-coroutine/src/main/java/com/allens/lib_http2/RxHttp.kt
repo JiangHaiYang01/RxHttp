@@ -4,6 +4,7 @@ import android.content.Context
 import com.allens.lib_http2.config.*
 import com.allens.lib_http2.core.HttpResult
 import com.allens.lib_http2.download.DownLoadManager
+import com.allens.lib_http2.download.utils.FileTool
 import com.allens.lib_http2.impl.OnCookieInterceptor
 import com.allens.lib_http2.impl.OnDownLoadListener
 import com.allens.lib_http2.impl.OnHeardListener
@@ -194,6 +195,11 @@ class RxHttp {
         } else if (result is HttpResult.Error) {
             error(result.throwable.message)
         }
+    }
+
+    //格式化小数
+    fun bytes2kb(bytes: Long): String {
+        return FileTool.bytes2kb(bytes)
     }
 }
 

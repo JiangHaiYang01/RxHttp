@@ -10,9 +10,21 @@ import okhttp3.ResponseBody
 import java.io.File
 import java.io.RandomAccessFile
 import java.nio.channels.FileChannel
+import java.text.DecimalFormat
 
 object FileTool {
     private const val TAG = RxHttp.TAG
+
+
+    //定义GB的计算常量
+    private const val GB = 1024 * 1024 * 1024
+
+    //定义MB的计算常量
+    private const val MB = 1024 * 1024
+
+    //定义KB的计算常量
+    private const val KB = 1024
+
 
     suspend fun downToFile(
         key: String,
@@ -30,6 +42,7 @@ object FileTool {
                 withContext(Dispatchers.Main) {
                     loadListener.onDownLoadError(key, Throwable("mkdirs file [$savePath]  error"))
                 }
+                DownLoadPool.remove(key)
                 return
             }
             //保存到文件
@@ -38,6 +51,7 @@ object FileTool {
             withContext(Dispatchers.Main) {
                 loadListener.onDownLoadError(key, throwable)
             }
+            DownLoadPool.remove(key)
         }
     }
 
@@ -77,6 +91,7 @@ object FileTool {
                     loadListener.onDownLoadProgress(key, progress)
                     loadListener.onUpdate(
                         key,
+                        progress,
                         currentSaveLength,
                         fileLength,
                         currentSaveLength == fileLength
@@ -122,5 +137,25 @@ object FileTool {
             return file.mkdirs()
         }
         return true
+    }
+
+
+    //格式化小数
+    fun bytes2kb(bytes: Long): String {
+        val format = DecimalFormat("###.0")
+        return when {
+            bytes / GB >= 1 -> {
+                format.format(bytes / GB) + "GB";
+            }
+            bytes / MB >= 1 -> {
+                format.format(bytes / MB) + "MB";
+            }
+            bytes / KB >= 1 -> {
+                format.format(bytes / KB) + "KB";
+            }
+            else -> {
+                "${bytes}B";
+            }
+        }
     }
 }

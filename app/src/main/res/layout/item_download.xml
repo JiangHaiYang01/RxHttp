@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:text="等待中..."
+        android:text="未开始..."
         app:layout_constraintBottom_toTopOf="@+id/progress_bar"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -31,6 +31,7 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_waiting" />
 
     <TextView
+        android:text="0%"
         android:id="@+id/tv_progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -41,6 +42,7 @@
 
     <TextView
         android:id="@+id/tv_size"
+        android:text="0.0M/0.0M"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBaseline_toBaselineOf="@+id/tv_progress"

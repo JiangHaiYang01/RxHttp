@@ -90,6 +90,13 @@ object DownLoadManager {
             Log.i(TAG, "startDownLoad key: $tag  url:$url  savePath: $savePath  saveName:$saveName")
         }
 
+        if (saveName.isEmpty()) {
+            withContext(Dispatchers.Main) {
+                loadListener.onDownLoadError(tag, Throwable("save name is Empty"))
+            }
+            return
+        }
+
         if (Looper.getMainLooper().thread == Thread.currentThread()) {
             withContext(Dispatchers.Main) {
                 loadListener.onDownLoadError(tag, Throwable("current thread is in main thread"))
@@ -107,28 +114,51 @@ object DownLoadManager {
             Log.i(TAG, "startDownLoad current $currentLength")
         }
 
+        try {
+            if (HttpConfig.isLog) {
+                Log.i(TAG, "add pool")
+            }
+            //添加到pool
+            DownLoadPool.add(tag, coroutineScope)
+            DownLoadPool.add(tag, "$savePath/$saveName")
+            DownLoadPool.add(tag, loadListener)
 
-        val response = HttpManager.getServiceFromDownLoad(ApiService::class.java)
-            .downloadFile("bytes=$currentLength-", url)
-        val responseBody =
-            response.body()
-        if (responseBody == null) {
-            if (HttpConfig.isLog)
-                Log.i(TAG, "responseBody is null")
-            return
+            withContext(Dispatchers.Main) {
+                loadListener.onDownLoadPrepare(key = tag)
+            }
+
+            val response = HttpManager.getServiceFromDownLoad(ApiService::class.java)
+                .downloadFile("bytes=$currentLength-", url)
+            val responseBody = response.body()
+            if (responseBody == null) {
+                if (HttpConfig.isLog) {
+                    Log.i(TAG, "responseBody is null")
+                    withContext(Dispatchers.Main) {
+                        loadListener.onDownLoadError(
+                            key = tag,
+                            throwable = Throwable("responseBody is null please check download url")
+                        )
+                    }
+                    DownLoadPool.remove(tag)
+                }
+                return
+            }
+
+
+            FileTool.downToFile(
+                tag,
+                savePath,
+                saveName,
+                currentLength,
+                responseBody,
+                loadListener
+            )
+        } catch (throwable: Throwable) {
+            withContext(Dispatchers.Main) {
+                loadListener.onDownLoadError(key = tag, throwable = throwable)
+            }
+            DownLoadPool.remove(tag)
         }
-        //添加到pool
-        DownLoadPool.add(tag, coroutineScope)
-        DownLoadPool.add(tag, "$savePath/$saveName")
-        DownLoadPool.add(tag, loadListener)
-        FileTool.downToFile(
-            tag,
-            savePath,
-            saveName,
-            currentLength,
-            responseBody,
-            loadListener
-        )
     }
 }
 
