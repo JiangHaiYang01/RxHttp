@@ -55,7 +55,7 @@ class DownLoadAct : AppCompatActivity(), CoroutineScope by MainScope(),
 
         for ((index, info) in downloadUrl.withIndex()) {
             data.add(
-                DownLoadInfo(info, info + "_" + index,"$index.apk")
+                DownLoadInfo(info, info + "_" + index, "$index.apk")
             )
         }
 
@@ -161,6 +161,11 @@ class DownLoadAct : AppCompatActivity(), CoroutineScope by MainScope(),
             rxHttp.bytes2kb(count),
             done
         )
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        rxHttp.doDownLoadPauseAll()
     }
 
 
