@@ -3,7 +3,6 @@ package com.allens.lib_http2
 import android.content.Context
 import com.allens.lib_http2.config.*
 import com.allens.lib_http2.core.HttpResult
-import com.allens.lib_http2.download.DownLoadManager
 import com.allens.lib_http2.download.utils.FileTool
 import com.allens.lib_http2.impl.*
 import com.allens.lib_http2.interceptor.OnCookieListener
@@ -65,6 +64,12 @@ class RxHttp {
 
         fun addLogListener(logListener: OnLogListener): Builder {
             HttpConfig.logListener = logListener
+            return this
+        }
+
+
+        fun addBuilderClientListener(listener: OnBuildClientListener): Builder {
+            HttpConfig.onBuildClientListener = listener
             return this
         }
 

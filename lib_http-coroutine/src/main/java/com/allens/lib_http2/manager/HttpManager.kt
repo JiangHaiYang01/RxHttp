@@ -109,11 +109,10 @@ object HttpManager {
     }
 
     private fun createRetrofit(): Retrofit {
-        return retrofitBuilder
+        val client = retrofitBuilder
             .client(okHttpBuilder.build())
-            //todo 需要对外提供一个方法 添加其他的 factory
-//            .addConverterFactory(GsonConverterFactory.create())             // json 解析器
-//            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+        HttpConfig.onBuildClientListener?.addBuildClient(client)
+        return client
             .baseUrl(HttpConfig.baseUrl)
             .build()
     }

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import com.allens.lib_http2.RxHttp
 import com.allens.lib_http2.config.HttpLevel
+import com.allens.lib_http2.impl.OnBuildClientListener
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 
@@ -27,6 +28,10 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
             .writeTimeout(10)
             .readTimeout(10)
             .connectTimeout(10)
+            .addBuilderClientListener(object : OnBuildClientListener {
+                override fun addBuildClient(client: retrofit2.Retrofit.Builder) {
+                }
+            })
             .build(this)
 
         btn_get.setOnClickListener {

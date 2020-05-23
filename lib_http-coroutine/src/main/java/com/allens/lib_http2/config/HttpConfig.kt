@@ -1,5 +1,6 @@
 package com.allens.lib_http2.config
 
+import com.allens.lib_http2.impl.OnBuildClientListener
 import com.allens.lib_http2.impl.OnCookieInterceptor
 import com.allens.lib_http2.interceptor.OnCookieListener
 import com.allens.lib_http2.impl.OnLogFilterListener
@@ -25,6 +26,7 @@ open class HttpConfig {
         var baseUrl: String = ""
         var logFilterListener: OnLogFilterListener? = null
         var logListener: OnLogListener? = null
+        var onBuildClientListener: OnBuildClientListener? = null
         var cookieListener: OnCookieListener? = null
         var onCookieInterceptor: OnCookieInterceptor? = null
         var heardMap: Map<String, String>? = null
