@@ -24,15 +24,21 @@ interface DownLoadProgressListener {
 interface OnDownLoadListener : DownLoadProgressListener {
 
 
+    //等待下载
     fun onDownLoadPrepare(key: String)
 
+    //进度
     fun onDownLoadProgress(key: String, progress: Int)
 
+    //下载失败
     fun onDownLoadError(key: String, throwable: Throwable)
 
+    //下载成功
     fun onDownLoadSuccess(key: String, path: String)
 
+    //下载暂停
     fun onDownLoadPause(key: String)
 
+    //下载取消
     fun onDownLoadCancel(key: String)
 }
