@@ -14,5 +14,7 @@ ext {
         implementation 'com.github.franmontiel:PersistentCookieJar:v1.0.1'
 
 //        implementation 'com.squareup.retrofit2:converter-gson:2.8.2'
+//        implementation 'com.squareup.retrofit2:adapter-rxjava2:2.8.2'
+
     }
 }

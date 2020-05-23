@@ -1,6 +1,5 @@
 package com.allens.lib_http2.impl
 
-import kotlinx.coroutines.Deferred
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -68,11 +67,11 @@ interface ApiService {
 
     @Multipart
     @POST
-    fun upload(
+    suspend fun upFileList(
         @Url url: String,
         @HeaderMap headers: HashMap<String, String>,
-        @QueryMap maps: Map<String, Any>,
-        @PartMap map: Map<String, RequestBody>
+        @QueryMap maps: Map<String, @JvmSuppressWildcards Any>,
+        @PartMap map: Map<String, @JvmSuppressWildcards RequestBody>
     ): Response<ResponseBody>
 
 }

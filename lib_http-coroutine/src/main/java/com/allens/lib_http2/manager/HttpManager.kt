@@ -113,6 +113,7 @@ object HttpManager {
             .client(okHttpBuilder.build())
             //todo 需要对外提供一个方法 添加其他的 factory
 //            .addConverterFactory(GsonConverterFactory.create())             // json 解析器
+//            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .baseUrl(HttpConfig.baseUrl)
             .build()
     }
@@ -129,15 +130,11 @@ object HttpManager {
 
 
     fun <T> getService(tClass: Class<T>): T {
-        val t = retrofit.create(tClass)
-//        retrofit = createRetrofit()
-        return t
+        return retrofit.create(tClass)
     }
 
-    fun <T> getServiceFromDownLoad(tClass: Class<T>): T {
-        val t = retrofitDownLoad.create(tClass)
-        retrofitDownLoad = createRetrofitByDownLoad()
-        return t
+    fun <T> getServiceFromDownLoadOrUpload(tClass: Class<T>): T {
+        return retrofitDownLoad.create(tClass)
     }
 
 

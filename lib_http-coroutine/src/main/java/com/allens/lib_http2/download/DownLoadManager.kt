@@ -1,7 +1,6 @@
 package com.allens.lib_http2.download
 
 import android.os.Looper
-import android.util.Log
 import com.allens.lib_http2.RxHttp
 import com.allens.lib_http2.config.HttpConfig
 import com.allens.lib_http2.download.utils.DownLoadPool
@@ -128,7 +127,7 @@ object DownLoadManager {
                 loadListener.onDownLoadPrepare(key = tag)
             }
 
-            val response = HttpManager.getServiceFromDownLoad(ApiService::class.java)
+            val response = HttpManager.getServiceFromDownLoadOrUpload(ApiService::class.java)
                 .downloadFile("bytes=$currentLength-", url)
             val responseBody = response.body()
             if (responseBody == null) {

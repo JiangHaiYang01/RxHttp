@@ -1,10 +1,13 @@
 package com.allens.lib_http2.tools
 
+import android.os.Handler
 import com.allens.lib_http2.core.HttpResult
 import com.allens.lib_http2.download.DownLoadManager
 import com.allens.lib_http2.impl.ApiService
 import com.allens.lib_http2.impl.OnDownLoadListener
+import com.allens.lib_http2.impl.OnUpLoadListener
 import com.allens.lib_http2.manager.HttpManager
+import com.allens.lib_http2.upload.ProgressRequestBody
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -16,8 +19,10 @@ class RequestBuilder {
 
     private val heard = HashMap<String, String>()
     private val map = HashMap<String, Any>()
-    private val bodyMap = HashMap<String, RequestBody>()
+    private val bodyMap = HashMap<String, ProgressRequestBody>()
 
+
+    private var handler: Handler? = null
     fun addHeard(key: String, value: String): RequestBuilder {
         heard[key] = value
         return this
@@ -30,9 +35,10 @@ class RequestBuilder {
 
 
     fun addFile(key: String, file: File): RequestBuilder {
+        handler = Handler()
         val fileBody: RequestBody =
             RequestBody.create("multipart/form-data".toMediaTypeOrNull(), file)
-        bodyMap[key] = fileBody
+        bodyMap[key] = ProgressRequestBody(null,"", fileBody, handler)
         return this
     }
 
@@ -98,14 +104,6 @@ class RequestBuilder {
     }
 
 
-    suspend fun <T : Any> doUpload(url: String, tClass: Class<T>): HttpResult<T> {
-        return executeResponse({
-            HttpManager.getService(ApiService::class.java)
-                .upload(url = url, headers = heard, maps = map, map = bodyMap).body()
-                ?.string()
-        }, tClass)
-    }
-
     private suspend fun <T : Any> executeResponse(
         call: suspend () -> String?,
         tClass: Class<T>
@@ -152,5 +150,45 @@ class RequestBuilder {
         DownLoadManager.doDownLoadCancelAll()
     }
 
+
+    //上传
+    private suspend fun <T : Any> doUpload(url: String, tClass: Class<T>): HttpResult<T> {
+        return executeResponse({
+            HttpManager.getServiceFromDownLoadOrUpload(ApiService::class.java)
+                .upFileList(url, heard, map, bodyMap).body()
+                ?.string()
+        }, tClass)
+    }
+
+
+    suspend fun <T : Any> doUpload(
+        tag: String,
+        url: String,
+        tClass: Class<T>,
+        listener: OnUpLoadListener<T>
+    ) {
+        for ((key, value) in bodyMap) {
+            bodyMap[key] = ProgressRequestBody(listener, tag, value.getRequestBody(), handler)
+        }
+        val doUpload = doUpload(url, tClass)
+        checkResult(doUpload, {
+            listener.onUpLoadSuccess(tag, it)
+        }, {
+            listener.onUpLoadFailed(tag, throwable = it)
+        })
+    }
+
+
+    private inline fun <T : Any> checkResult(
+        result: HttpResult<T>,
+        success: (T) -> Unit,
+        error: (Throwable) -> Unit
+    ) {
+        if (result is HttpResult.Success) {
+            success(result.data)
+        } else if (result is HttpResult.Error) {
+            error(result.throwable)
+        }
+    }
 
 }
