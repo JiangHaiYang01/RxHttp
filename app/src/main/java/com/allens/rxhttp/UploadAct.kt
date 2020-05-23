@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,6 +31,8 @@ class UploadAct : AppCompatActivity(), CoroutineScope by MainScope(),
 
     private lateinit var myAdapter: UploadAdapter
 
+    private val upLoadList = mutableListOf<UpLoadInfo>()
+
     companion object {
         const val CUSTOM_REQUEST_CODE = 1
         const val TAG = "Upload"
@@ -49,12 +53,6 @@ class UploadAct : AppCompatActivity(), CoroutineScope by MainScope(),
             .connectTimeout(10)
             .build(this)
 
-
-        btn_select_file.setOnClickListener {
-            FilePickerManager
-                .from(activity = this)
-                .forResult(CUSTOM_REQUEST_CODE)
-        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -62,16 +60,16 @@ class UploadAct : AppCompatActivity(), CoroutineScope by MainScope(),
         when (requestCode) {
             CUSTOM_REQUEST_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
+                    upLoadList.clear()
                     val list = FilePickerManager.obtainData()
-                    val pathList = mutableListOf<UpLoadInfo>()
                     for (path in list) {
-                        pathList.add(UpLoadInfo(path, path + "_" + "taskId"))
+                        upLoadList.add(UpLoadInfo(path, path + "_" + "taskId"))
                     }
 
                     val mLayoutManager =
                         LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
                     mRecyclerView.layoutManager = mLayoutManager
-                    myAdapter = UploadAdapter(pathList, mRecyclerView)
+                    myAdapter = UploadAdapter(upLoadList, mRecyclerView)
                     mRecyclerView.adapter = myAdapter
                     myAdapter.setOnBtnClickListener(this)
                 } else {
@@ -101,7 +99,43 @@ class UploadAct : AppCompatActivity(), CoroutineScope by MainScope(),
         }
     }
 
-    override fun onItemClickPause(info: UpLoadInfo) {
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        if (menu == null)
+            return false
+        menu.add(1, 1, 1, "选择文件")
+        menu.add(1, 2, 2, "全部开始")
+        menu.add(1, 3, 2, "全部取消")
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            1 -> {
+                FilePickerManager
+                    .from(activity = this)
+                    .forResult(CUSTOM_REQUEST_CODE)
+            }
+            2 -> {
+                for (data in upLoadList) {
+                    launch {
+                        startUploadSuspend(data)
+                    }
+                }
+            }
+            3 -> {
+                for (data in upLoadList) {
+                    rxHttp.create().doUpLoadCancel(data.taskId)
+                }
+            }
+
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+
+    override fun onItemClickCancel(info: UpLoadInfo) {
+        rxHttp.create().doUpLoadCancel(info.taskId)
     }
 
     override fun onRxHttpLog(message: String) {
@@ -132,9 +166,25 @@ class UploadAct : AppCompatActivity(), CoroutineScope by MainScope(),
         )
     }
 
+    override fun onUploadCancel(tag: String) {
+        myAdapter.uploadCancel(tag)
+    }
+
     override fun onUpLoadSuccess(tag: String, data: TestBean) {
         Log.i(TAG, "data ----> $data thread ${Thread.currentThread().name}")
         myAdapter.uploadSuccess(tag, data)
+    }
+
+    override fun opUploadPrepare(tag: String) {
+        Log.i(TAG, "opUploadPrepare ----> thread ${Thread.currentThread().name}")
+        myAdapter.uploadPrepare(tag)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        for (data in upLoadList) {
+            rxHttp.create().doUpLoadCancel(data.taskId)
+        }
     }
 }
 

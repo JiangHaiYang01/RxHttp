@@ -8,14 +8,9 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/mRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="300dp" />
+        android:layout_height="match_parent" />
 
 
-    <Button
-        android:id="@+id/btn_select_file"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="选择文件" />
 
 </LinearLayout>
 

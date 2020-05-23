@@ -29,7 +29,7 @@ class UploadAdapter(
             if (holder.btnStart.text == "开始")
                 onBtnClickListener?.onItemClickStart(mData[position])
             else
-                onBtnClickListener?.onItemClickPause(mData[position])
+                onBtnClickListener?.onItemClickCancel(mData[position])
         }
     }
 
@@ -50,7 +50,7 @@ class UploadAdapter(
 
     interface OnBtnClickListener {
         fun onItemClickStart(info: UpLoadInfo)
-        fun onItemClickPause(info: UpLoadInfo)
+        fun onItemClickCancel(info: UpLoadInfo)
     }
 
     fun setOnBtnClickListener(listener: OnBtnClickListener) {
@@ -63,7 +63,7 @@ class UploadAdapter(
     }
 
     fun uploadProgress(key: String, progress: Int, bytes2kb: String, bytes2kb1: String) {
-        getChildAt(key)?.findViewById<TextView>(R.id.bt_pause)?.text = "暂停"
+        getChildAt(key)?.findViewById<TextView>(R.id.bt_pause)?.text = "取消"
         getChildAt(key)?.findViewById<TextView>(R.id.tv_size)?.text = "$bytes2kb/$bytes2kb1"
         getChildAt(key)?.findViewById<TextView>(R.id.tv_waiting)?.text = "正在上传"
         getChildAt(key)?.findViewById<TextView>(R.id.tv_progress)?.text = "$progress%"
@@ -83,6 +83,16 @@ class UploadAdapter(
             }
         }
         return null
+    }
+
+    fun uploadPrepare(tag: String) {
+        getChildAt(tag)?.findViewById<TextView>(R.id.tv_waiting)?.text = "等待中..."
+        getChildAt(tag)?.findViewById<TextView>(R.id.bt_pause)?.text = "取消"
+    }
+
+    fun uploadCancel(key: String) {
+        getChildAt(key)?.findViewById<TextView>(R.id.tv_waiting)?.text = "已取消"
+        getChildAt(key)?.findViewById<TextView>(R.id.bt_pause)?.text = "开始"
     }
 
 

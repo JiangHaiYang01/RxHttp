@@ -1,13 +1,21 @@
 package com.allens.lib_http2.impl
 
 
-interface OnUpLoadListener<T> : UploadProgressListener {
+interface OnUpLoadListener<T> : UploadProgressListener, UpLoadCancelListener {
+
+    fun opUploadPrepare(tag: String)
 
     fun onUpLoadSuccess(tag: String, data: T)
 
     fun onUpLoadFailed(tag: String, throwable: Throwable)
+
+
 }
 
+
+interface UpLoadCancelListener {
+    fun onUploadCancel(tag: String)
+}
 
 interface UploadProgressListener {
     /**
@@ -17,5 +25,5 @@ interface UploadProgressListener {
      * @param totalBytes   文件的总字节数
      * @param progress     进度
      */
-    fun onUploadProgress(tag: String,bytesWriting: Long, totalBytes: Long, progress: Int)
+    fun onUploadProgress(tag: String, bytesWriting: Long, totalBytes: Long, progress: Int)
 }

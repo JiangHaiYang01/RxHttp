@@ -8,6 +8,9 @@ import com.allens.lib_http2.impl.OnDownLoadListener
 import com.allens.lib_http2.impl.OnUpLoadListener
 import com.allens.lib_http2.manager.HttpManager
 import com.allens.lib_http2.upload.ProgressRequestBody
+import com.allens.lib_http2.upload.UpLoadPool
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -38,7 +41,7 @@ class RequestBuilder {
         handler = Handler()
         val fileBody: RequestBody =
             RequestBody.create("multipart/form-data".toMediaTypeOrNull(), file)
-        bodyMap[key] = ProgressRequestBody(null,"", fileBody, handler)
+        bodyMap[key] = ProgressRequestBody(null, "", fileBody, handler)
         return this
     }
 
@@ -167,15 +170,33 @@ class RequestBuilder {
         tClass: Class<T>,
         listener: OnUpLoadListener<T>
     ) {
-        for ((key, value) in bodyMap) {
-            bodyMap[key] = ProgressRequestBody(listener, tag, value.getRequestBody(), handler)
+        withContext(Dispatchers.IO) {
+            for ((key, value) in bodyMap) {
+                bodyMap[key] = ProgressRequestBody(listener, tag, value.getRequestBody(), handler)
+            }
+            UpLoadPool.add(tag, listener, this)
+            withContext(Dispatchers.Main) {
+                listener.opUploadPrepare(tag)
+            }
+            val doUpload = doUpload(url, tClass)
+            checkResult(doUpload, {
+                withContext(Dispatchers.Main) {
+                    listener.onUpLoadSuccess(tag, it)
+                }
+
+                UpLoadPool.remove(tag)
+            }, {
+                withContext(Dispatchers.Main) {
+                    listener.onUpLoadFailed(tag, throwable = it)
+                }
+                UpLoadPool.remove(tag)
+            })
         }
-        val doUpload = doUpload(url, tClass)
-        checkResult(doUpload, {
-            listener.onUpLoadSuccess(tag, it)
-        }, {
-            listener.onUpLoadFailed(tag, throwable = it)
-        })
+    }
+
+    fun doUpLoadCancel(tag: String) {
+        UpLoadPool.getListener(tag)?.onUploadCancel(tag)
+        UpLoadPool.remove(tag)
     }
 
 
