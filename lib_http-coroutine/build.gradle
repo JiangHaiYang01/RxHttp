@@ -7,3 +7,16 @@ apply plugin: 'kotlin-android-extensions'
 apply from: 'config.gradle'
 //编译配置
 apply from: '../config_compile.gradle'
+
+android{
+    //==========================================================================================
+    // lib 模块是否开启自定义的混淆
+    //==========================================================================================
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}

@@ -9,6 +9,8 @@ import com.allens.lib_http2.config.HttpLevel
 import com.allens.lib_http2.impl.OnBuildClientListener
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
 
@@ -29,7 +31,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
             .readTimeout(10)
             .connectTimeout(10)
             .addBuilderClientListener(object : OnBuildClientListener {
-                override fun addBuildClient(client: retrofit2.Retrofit.Builder) {
+                override fun addBuildClient(): MutableSet<Any> {
+                    return mutableSetOf(GsonConverterFactory.create(),RxJava2CallAdapterFactory.create())
                 }
             })
             .build(this)

@@ -2,17 +2,21 @@ package com.allens.lib_http2.manager
 
 import android.content.Context
 import android.os.Environment
+import com.allens.lib_http2.RxHttp
 import com.allens.lib_http2.config.HttpConfig
 import com.allens.lib_http2.config.HttpNetWorkType
 import com.allens.lib_http2.interceptor.*
 import com.allens.lib_http2.interceptor.CacheInterceptor
 import com.allens.lib_http2.interceptor.CacheNetworkInterceptor
+import com.allens.lib_http2.tools.RxHttpLogTool
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import com.google.gson.Gson
 import okhttp3.Cache
 import okhttp3.OkHttpClient
+import retrofit2.CallAdapter
+import retrofit2.Converter
 import retrofit2.Retrofit
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -111,7 +115,31 @@ object HttpManager {
     private fun createRetrofit(): Retrofit {
         val client = retrofitBuilder
             .client(okHttpBuilder.build())
-        HttpConfig.onBuildClientListener?.addBuildClient(client)
+
+        val set = HttpConfig.onBuildClientListener?.addBuildClient()
+        RxHttpLogTool.i(RxHttp.TAG, "factory size  ${set?.size}")
+        set?.forEach {
+            try {
+                when (it) {
+                    is Converter.Factory -> {
+                        client.addConverterFactory(it)
+                        RxHttpLogTool.i(RxHttp.TAG, "addConverterFactory $it")
+                    }
+                    is CallAdapter.Factory -> {
+                        client.addCallAdapterFactory(it)
+                        RxHttpLogTool.i(RxHttp.TAG, "addCallAdapterFactory $it")
+                    }
+                    else -> {
+                        RxHttpLogTool.i(
+                            RxHttp.TAG,
+                            "factory is not Converter.Factory or CallAdapter.Factory, please check "
+                        )
+                    }
+                }
+            } catch (throwable: Throwable) {
+                RxHttpLogTool.i(RxHttp.TAG, "add factory failed ${throwable.message}")
+            }
+        }
         return client
             .baseUrl(HttpConfig.baseUrl)
             .build()
