@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.util.*
@@ -40,7 +41,7 @@ class RequestBuilder {
     fun addFile(key: String, file: File): RequestBuilder {
         handler = Handler()
         val fileBody: RequestBody =
-            RequestBody.create("multipart/form-data".toMediaTypeOrNull(), file)
+            file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
         bodyMap[key] = ProgressRequestBody(null, "", fileBody, handler)
         return this
     }

@@ -14,10 +14,8 @@ object HeardInterceptor {
             val request = chain.request()
             val builder: Request.Builder = request.newBuilder()
             for ((key, value) in map.entries) {
-                if (HttpConfig.isLog) {
-                    RxHttpLogTool.i(RxHttp.TAG, "http----> add heard [key]:$key [value]:$value ")
-                    builder.addHeader(key, value)
-                }
+                RxHttpLogTool.i(RxHttp.TAG, "http----> add heard [key]:$key [value]:$value ")
+                builder.addHeader(key, value)
             }
             chain.proceed(builder.build())
         }

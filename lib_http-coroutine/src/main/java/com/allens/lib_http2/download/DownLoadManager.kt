@@ -77,18 +77,17 @@ object DownLoadManager {
         //判断是否已经在队列中
         val scope = DownLoadPool.getScopeFromKey(tag)
         if (scope != null && scope.isActive) {
-            if (HttpConfig.isLog)
-                RxHttpLogTool.i(TAG, "key $tag 已经在队列中")
+            RxHttpLogTool.i(TAG, "key $tag 已经在队列中")
             return
         } else if (scope != null && !scope.isActive) {
-            if (HttpConfig.isLog)
-                RxHttpLogTool.i(TAG, "key $tag 已经在队列中 但是已经不再活跃 remove")
+            RxHttpLogTool.i(TAG, "key $tag 已经在队列中 但是已经不再活跃 remove")
             DownLoadPool.removeExitSp(tag)
         }
 
-        if (HttpConfig.isLog) {
-            RxHttpLogTool.i(TAG, "startDownLoad key: $tag  url:$url  savePath: $savePath  saveName:$saveName")
-        }
+        RxHttpLogTool.i(
+            TAG,
+            "startDownLoad key: $tag  url:$url  savePath: $savePath  saveName:$saveName"
+        )
 
         if (saveName.isEmpty()) {
             withContext(Dispatchers.Main) {
@@ -110,14 +109,10 @@ object DownLoadManager {
         } else {
             ShareDownLoadUtil.getLong(tag, 0)
         }
-        if (HttpConfig.isLog) {
-            RxHttpLogTool.i(TAG, "startDownLoad current $currentLength")
-        }
+        RxHttpLogTool.i(TAG, "startDownLoad current $currentLength")
 
         try {
-            if (HttpConfig.isLog) {
-                RxHttpLogTool.i(TAG, "add pool")
-            }
+            RxHttpLogTool.i(TAG, "add pool")
             //添加到pool
             DownLoadPool.add(tag, coroutineScope)
             DownLoadPool.add(tag, "$savePath/$saveName")
