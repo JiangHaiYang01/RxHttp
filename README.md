@@ -353,7 +353,7 @@ enum class CacheType {
 
 ![扫码下载](https://allens-blog.oss-cn-beijing.aliyuncs.com/uPic/2020-05-23-14-20-35-1590214835%20.png)
 
-# Licens
+# License
 
 ```
 Licensed under the Apache License, Version 2.0 (the "License");
