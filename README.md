@@ -353,6 +353,11 @@ enum class CacheType {
 
 ![扫码下载](https://allens-blog.oss-cn-beijing.aliyuncs.com/uPic/2020-05-23-14-20-35-1590214835%20.png)
 
+
+## 博客（更新日志）
+
+[博客地址](https://jianghaiyang01.github.io/posts/d45b0d85/#more)
+
 # Licens
 
 ```
