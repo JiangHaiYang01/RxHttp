@@ -11,4 +11,18 @@ sealed class HttpResult<out T : Any> {
             is Error -> "Error[throwable=$throwable]"
         }
     }
+
+    inline fun result(
+        success: (T) -> Unit,
+        error: (Throwable) -> Unit
+    ) {
+        when (this) {
+            is Success -> {
+                success(data)
+            }
+            is Error -> {
+                error(throwable)
+            }
+        }
+    }
 }

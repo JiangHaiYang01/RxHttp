@@ -180,37 +180,25 @@ class RequestBuilder {
                 listener.opUploadPrepare(tag)
             }
             val doUpload = doUpload(url, tClass)
-            checkResult(doUpload, {
-                withContext(Dispatchers.Main) {
-                    listener.onUpLoadSuccess(tag, it)
-                }
+                .result(
+                    {
+                        withContext(Dispatchers.Main) {
+                            listener.onUpLoadSuccess(tag, it)
+                        }
 
-                UpLoadPool.remove(tag)
-            }, {
-                withContext(Dispatchers.Main) {
-                    listener.onUpLoadFailed(tag, throwable = it)
-                }
-                UpLoadPool.remove(tag)
-            })
+                        UpLoadPool.remove(tag)
+                    }, {
+                        withContext(Dispatchers.Main) {
+                            listener.onUpLoadFailed(tag, throwable = it)
+                        }
+                        UpLoadPool.remove(tag)
+                    })
         }
     }
 
     fun doUpLoadCancel(tag: String) {
         UpLoadPool.getListener(tag)?.onUploadCancel(tag)
         UpLoadPool.remove(tag)
-    }
-
-
-    private inline fun <T : Any> checkResult(
-        result: HttpResult<T>,
-        success: (T) -> Unit,
-        error: (Throwable) -> Unit
-    ) {
-        if (result is HttpResult.Success) {
-            success(result.data)
-        } else if (result is HttpResult.Error) {
-            error(result.throwable)
-        }
     }
 
 }

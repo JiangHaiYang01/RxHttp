@@ -157,19 +157,6 @@ class RxHttp {
         return RequestBuilder()
     }
 
-
-    inline fun <T : Any> checkResult(
-        result: HttpResult<T>,
-        success: (T) -> Unit,
-        error: (String?) -> Unit
-    ) {
-        if (result is HttpResult.Success) {
-            success(result.data)
-        } else if (result is HttpResult.Error) {
-            error(result.throwable.message)
-        }
-    }
-
     //格式化小数
     fun bytes2kb(bytes: Long): String {
         return FileTool.bytes2kb(bytes)

@@ -32,7 +32,10 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
             .connectTimeout(10)
             .addBuilderClientListener(object : OnBuildClientListener {
                 override fun addBuildClient(): MutableSet<Any> {
-                    return mutableSetOf(GsonConverterFactory.create(),RxJava2CallAdapterFactory.create())
+                    return mutableSetOf(
+                        GsonConverterFactory.create(),
+                        RxJava2CallAdapterFactory.create()
+                    )
                 }
             })
             .build(this)
@@ -54,17 +57,20 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
 
     private fun postRequest() {
         launch {
-            val data = rxHttp
+            rxHttp
                 .create()
                 .addParameter("title", "123456")
                 .addParameter("author", "123456")
                 .addParameter("link", "123456")
                 .doPost("lg/collect/add/json", TestBean::class.java)
-            rxHttp.checkResult(data, {
-                log.text = it.toString()
-            }, {
-                log.text = it.toString()
-            })
+                .result(
+                    {
+                        log.text = it.toString()
+                    },
+                    {
+                        log.text = it.message.toString()
+                    }
+                )
         }
     }
 
@@ -76,15 +82,13 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
                 .create()
                 .addParameter("k", "java")
                 .doGet(parameter = "wxarticle/chapters/json", tClass = TestBean::class.java)
-
-            Log.i(TAG, "收到响应 $data thread ${Thread.currentThread().name}")
-            rxHttp.checkResult(data, {
-                Log.i(TAG, "success ${Thread.currentThread().name} info $it ")
-                log.text = it.toString()
-            }, {
-                Log.i(TAG, "error ${Thread.currentThread().name} info ${it.toString()} ")
-                log.text = it.toString()
-            })
+                .result({
+                    Log.i(TAG, "success ${Thread.currentThread().name} info $it ")
+                    log.text = it.toString()
+                }, {
+                    Log.i(TAG, "error ${Thread.currentThread().name} info ${it.toString()} ")
+                    log.text = it.toString()
+                })
         }
     }
 }
