@@ -8,7 +8,7 @@ Retrofit 与 协程 完美结合，支持断点下载，上传，支持缓存
 
 # License
 
-## 博客（更新日志）
+## 使用说明
 
 [博客地址](https://jianghaiyang01.github.io/posts/d45b0d85/#more)
 
