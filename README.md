@@ -4,7 +4,7 @@ Retrofit2 与 协程 结合，网络请求框架
 <!--more -->
 
 
-> 建议在 [博客说明](https://allens.icu/posts/d45b0d85/#more) 中查看，阅读体验更佳
+> 建议在 [博客说明](https://allens.icu/posts/d45b0d85/#more) 中查看，阅读体验更佳(之后的更新说明也会同步在博客中)
 
 # 前言
 
