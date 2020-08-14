@@ -2,7 +2,7 @@ apply plugin: 'kotlin-kapt'
 ext {
     android {
         //编译的SDK版本
-        compileSdkVersion 29
+        compileSdkVersion 30
         //编译的Tools版本
         buildToolsVersion "29.0.2"
 
@@ -11,9 +11,9 @@ ext {
         //==========================================================================================
         defaultConfig {
             //支持的最低版本
-            minSdkVersion 21
+            minSdkVersion 19
             //支持的目标版本
-            targetSdkVersion 29
+            targetSdkVersion 30
             //版本号
             versionCode 1
             //版本名称

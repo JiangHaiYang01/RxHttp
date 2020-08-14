@@ -42,7 +42,7 @@ object HttpManager {
     fun build(context: Context): HttpManager {
         HttpManager.context = context
         buildOkHttp(context)
-        retrofit = createRetrofit()
+        retrofit = createRetrofit(HttpConfig.baseUrl)
         retrofitDownLoad = createRetrofitByDownLoad()
         return this
     }
@@ -72,6 +72,12 @@ object HttpManager {
         okHttpBuilder.readTimeout(HttpConfig.readTime, TimeUnit.SECONDS)
         okHttpBuilder.writeTimeout(HttpConfig.writeTime, TimeUnit.SECONDS)
         okHttpBuilder.retryOnConnectionFailure(HttpConfig.retryOnConnectionFailure)
+
+
+
+        //动态替换BaseURL
+        okHttpBuilder.addInterceptor(HostSelectionInterceptor())
+
         if (HttpConfig.isLog)
             okHttpBuilder.addInterceptor(LogInterceptor.register(HttpConfig.level))
         val map = HttpConfig.heardMap
@@ -112,7 +118,7 @@ object HttpManager {
 
     }
 
-    private fun createRetrofit(): Retrofit {
+    private fun createRetrofit(baseUrl:String): Retrofit {
         val client = retrofitBuilder
             .client(okHttpBuilder.build())
 
@@ -141,7 +147,7 @@ object HttpManager {
             }
         }
         return client
-            .baseUrl(HttpConfig.baseUrl)
+            .baseUrl(baseUrl)
             .build()
     }
 
@@ -152,7 +158,7 @@ object HttpManager {
      */
     private fun createRetrofitByDownLoad(): Retrofit {
         okHttpBuilder.interceptors().clear()
-        return createRetrofit()
+        return createRetrofit(HttpConfig.baseUrl)
     }
 
 

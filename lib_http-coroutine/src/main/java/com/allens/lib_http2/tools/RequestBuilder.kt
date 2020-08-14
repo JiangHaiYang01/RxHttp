@@ -1,5 +1,6 @@
 package com.allens.lib_http2.tools
 
+import android.os.Build
 import android.os.Handler
 import com.allens.lib_http2.core.HttpResult
 import com.allens.lib_http2.download.DownLoadManager
@@ -26,14 +27,24 @@ class RequestBuilder {
     private val bodyMap = HashMap<String, ProgressRequestBody>()
 
 
+    companion object {
+        val CHANGE_URL = Build.BRAND + "_" + Build.MODEL + "_" + "CHANGE_URL"
+    }
+
     private var handler: Handler? = null
     fun addHeard(key: String, value: String): RequestBuilder {
         heard[key] = value
+
         return this
     }
 
     fun addParameter(key: String, value: Any): RequestBuilder {
         map[key] = value
+        return this
+    }
+
+    fun changeBaseUrl(url: String): RequestBuilder {
+        addHeard(CHANGE_URL, url)
         return this
     }
 
