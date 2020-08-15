@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
             Log.i(TAG, "get 方法启动 线程 ${Thread.currentThread().name}")
             rxHttp
                 .create()
-                .changeBaseUrl("host")
+                .changeBaseUrl("http://www.12345.com")
                 .addParameter("k", "java")
                 .doGet(parameter = "wxarticle/chapters/json", tClass = TestBean::class.java)
                 .result({
