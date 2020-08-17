@@ -2,6 +2,7 @@ package com.allens.lib_http2.tools
 
 import android.os.Build
 import android.os.Handler
+import android.util.Log
 import com.allens.lib_http2.core.HttpResult
 import com.allens.lib_http2.download.DownLoadManager
 import com.allens.lib_http2.impl.ApiService
@@ -82,6 +83,7 @@ class RequestBuilder {
 
     suspend fun <T : Any> doPost(parameter: String, tClass: Class<T>): HttpResult<T> {
         return executeResponse({
+            Log.i("allens", "post 方法启动 线程 ${Thread.currentThread().name}")
             HttpManager.getService(ApiService::class.java)
                 .doPost(parameter, heard, map).body()
                 ?.string()
@@ -124,7 +126,9 @@ class RequestBuilder {
         tClass: Class<T>
     ): HttpResult<T> {
         return try {
-            HttpResult.Success(HttpManager.gson.fromJson(call(), tClass))
+            withContext(Dispatchers.IO) {
+                HttpResult.Success(HttpManager.gson.fromJson(call(), tClass))
+            }
         } catch (e: Throwable) {
             HttpResult.Error(e)
         }
@@ -190,18 +194,13 @@ class RequestBuilder {
             withContext(Dispatchers.Main) {
                 listener.opUploadPrepare(tag)
             }
-            val doUpload = doUpload(url, tClass)
+             doUpload(url, tClass)
                 .result(
                     {
-                        withContext(Dispatchers.Main) {
-                            listener.onUpLoadSuccess(tag, it)
-                        }
-
+                        listener.onUpLoadSuccess(tag, it)
                         UpLoadPool.remove(tag)
                     }, {
-                        withContext(Dispatchers.Main) {
-                            listener.onUpLoadFailed(tag, throwable = it)
-                        }
+                        listener.onUpLoadFailed(tag, throwable = it)
                         UpLoadPool.remove(tag)
                     })
         }

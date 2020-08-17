@@ -67,7 +67,6 @@ rxHttp = RxHttp.Builder()
 ```java
   private fun getRequest() {
         launch {
-            Log.i(TAG, "get 方法启动 线程 ${Thread.currentThread().name}")
             val data = rxHttp
                 .create()
                 .addParameter("k", "java")

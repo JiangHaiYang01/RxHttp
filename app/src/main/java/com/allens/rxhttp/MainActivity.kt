@@ -77,10 +77,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
 
     private fun getRequest() {
         launch {
-            Log.i(TAG, "get 方法启动 线程 ${Thread.currentThread().name}")
             rxHttp
                 .create()
-                .changeBaseUrl("http://www.12345.com")
+                .changeBaseUrl("http://localhost")
                 .addParameter("k", "java")
                 .doGet(parameter = "wxarticle/chapters/json", tClass = TestBean::class.java)
                 .result({

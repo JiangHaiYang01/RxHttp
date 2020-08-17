@@ -1,5 +1,8 @@
 package com.allens.lib_http2.core
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
 sealed class HttpResult<out T : Any> {
 
     data class Success<out T : Any>(val data: T) : HttpResult<T>()
@@ -12,17 +15,24 @@ sealed class HttpResult<out T : Any> {
         }
     }
 
-    inline fun result(
-        success: (T) -> Unit,
-        error: (Throwable) -> Unit
+    suspend inline fun result(
+        crossinline success: (T) -> Unit,
+        crossinline error: (Throwable) -> Unit
     ) {
         when (this) {
             is Success -> {
-                success(data)
+                withContext(Dispatchers.Main){
+                    success(data)
+                }
+
             }
             is Error -> {
-                error(throwable)
+                withContext(Dispatchers.Main){
+                    error(throwable)
+                }
             }
         }
+
+
     }
 }
