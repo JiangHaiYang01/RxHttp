@@ -34,6 +34,8 @@ class RequestBuilder {
     }
 
     private var handler: Handler? = null
+
+    //添加请求头
     fun addHeard(key: String, value: String): RequestBuilder {
         heard[key] = value
 
