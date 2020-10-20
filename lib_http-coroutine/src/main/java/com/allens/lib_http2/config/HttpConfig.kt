@@ -1,9 +1,8 @@
 package com.allens.lib_http2.config
 
-import com.allens.lib_http2.impl.OnBuildClientListener
+import com.allens.lib_http2.impl.OnFactoryListener
 import com.allens.lib_http2.impl.OnCookieInterceptor
 import com.allens.lib_http2.interceptor.OnCookieListener
-import com.allens.lib_http2.impl.OnLogFilterListener
 import com.allens.lib_http2.impl.OnLogListener
 import okhttp3.logging.HttpLoggingInterceptor
 
@@ -17,16 +16,20 @@ import okhttp3.logging.HttpLoggingInterceptor
 
 open class HttpConfig {
     companion object {
+        var baseUrl: String = ""
         var connectTime: Long = 10
         var readTime: Long = 10
         var writeTime: Long = 10
+
         var retryOnConnectionFailure: Boolean = false
+
         var isLog: Boolean = true
         var level: HttpLevel = HttpLevel.BODY
-        var baseUrl: String = ""
-        var logFilterListener: OnLogFilterListener? = null
-        var logListener: OnLogListener? = null
-        var onBuildClientListener: OnBuildClientListener? = null
+        var logFilterListener: OnLogListener.OnLogFilterListener? = null
+        var logListener: OnLogListener.OnLogInterceptorListener? = null
+
+
+        var onFactoryListener: OnFactoryListener? = null
         var cookieListener: OnCookieListener? = null
         var onCookieInterceptor: OnCookieInterceptor? = null
         var heardMap: Map<String, String>? = null

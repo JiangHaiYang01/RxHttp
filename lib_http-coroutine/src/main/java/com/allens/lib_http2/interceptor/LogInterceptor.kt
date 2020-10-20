@@ -1,6 +1,5 @@
 package com.allens.lib_http2.interceptor
 
-import android.util.Log
 import com.allens.lib_http2.RxHttp
 import com.allens.lib_http2.config.HttpConfig
 import com.allens.lib_http2.config.HttpLevel
@@ -15,18 +14,20 @@ import okhttp3.logging.HttpLoggingInterceptor
  * @Version:        1.0
  */
 
-//日志拦截器`
+//日志拦截器
 object LogInterceptor {
     fun register(level: HttpLevel): HttpLoggingInterceptor {
         val interceptor = HttpLoggingInterceptor(object : HttpLoggingInterceptor.Logger {
             override fun log(message: String) {
                 val logFilterListener = HttpConfig.logFilterListener
                 if (logFilterListener != null) {
-                    if (logFilterListener.filter(message)) {
+                    if (logFilterListener.logFilter(message)) {
                         return
                     }
                 }
                 RxHttpLogTool.i(RxHttp.TAG, "http----> $message ")
+                if (HttpConfig.isLog)
+                    HttpConfig.logListener?.onLogInterceptorInfo(message)
             }
         })
         interceptor.level = HttpLevel.conversion(level)

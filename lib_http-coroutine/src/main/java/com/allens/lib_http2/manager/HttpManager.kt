@@ -15,8 +15,6 @@ import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersisto
 import com.google.gson.Gson
 import okhttp3.Cache
 import okhttp3.OkHttpClient
-import retrofit2.CallAdapter
-import retrofit2.Converter
 import retrofit2.Retrofit
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -74,7 +72,6 @@ object HttpManager {
         okHttpBuilder.retryOnConnectionFailure(HttpConfig.retryOnConnectionFailure)
 
 
-
         //动态替换BaseURL
         okHttpBuilder.addInterceptor(HostSelectionInterceptor())
 
@@ -118,32 +115,29 @@ object HttpManager {
 
     }
 
-    private fun createRetrofit(baseUrl:String): Retrofit {
+    private fun createRetrofit(baseUrl: String): Retrofit {
         val client = retrofitBuilder
             .client(okHttpBuilder.build())
 
-        val set = HttpConfig.onBuildClientListener?.addBuildClient()
-        RxHttpLogTool.i(RxHttp.TAG, "factory size  ${set?.size}")
-        set?.forEach {
+        val callAdapterFactorySet = HttpConfig.onFactoryListener?.addCallAdapterFactory()
+        callAdapterFactorySet?.forEach {
             try {
-                when (it) {
-                    is Converter.Factory -> {
-                        client.addConverterFactory(it)
-                        RxHttpLogTool.i(RxHttp.TAG, "addConverterFactory $it")
-                    }
-                    is CallAdapter.Factory -> {
-                        client.addCallAdapterFactory(it)
-                        RxHttpLogTool.i(RxHttp.TAG, "addCallAdapterFactory $it")
-                    }
-                    else -> {
-                        RxHttpLogTool.i(
-                            RxHttp.TAG,
-                            "factory is not Converter.Factory or CallAdapter.Factory, please check "
-                        )
-                    }
-                }
+                client.addCallAdapterFactory(it)
+                RxHttpLogTool.i(RxHttp.TAG, "addCallAdapterFactory $it")
             } catch (throwable: Throwable) {
                 RxHttpLogTool.i(RxHttp.TAG, "add factory failed ${throwable.message}")
+            }
+        }
+
+
+        val converterFactorySet = HttpConfig.onFactoryListener?.addConverterFactory()
+        RxHttpLogTool.i(RxHttp.TAG, "converterFactorySet size  ${converterFactorySet?.size}")
+        converterFactorySet?.forEach {
+            try {
+                client.addConverterFactory(it)
+                RxHttpLogTool.i(RxHttp.TAG, "addConverterFactory $it")
+            } catch (throwable: Throwable) {
+                RxHttpLogTool.i(RxHttp.TAG, "add converterFactory failed ${throwable.message}")
             }
         }
         return client

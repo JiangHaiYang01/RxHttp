@@ -13,9 +13,6 @@ import com.allens.lib_http2.RxHttp
 import com.allens.lib_http2.config.HttpLevel
 import com.allens.lib_http2.impl.OnLogListener
 import com.allens.lib_http2.impl.OnUpLoadListener
-import com.allens.lib_http2.impl.UploadProgressListener
-import kotlinx.android.synthetic.main.activity_dowload.*
-import kotlinx.android.synthetic.main.activity_upload.*
 import kotlinx.android.synthetic.main.activity_upload.mRecyclerView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
@@ -25,7 +22,7 @@ import java.io.File
 
 
 class UploadAct : AppCompatActivity(), CoroutineScope by MainScope(),
-    UploadAdapter.OnBtnClickListener, OnLogListener, OnUpLoadListener<TestBean> {
+    UploadAdapter.OnBtnClickListener, OnLogListener, OnUpLoadListener<TestBean>{
 
     private lateinit var rxHttp: RxHttp
 
@@ -49,7 +46,6 @@ class UploadAct : AppCompatActivity(), CoroutineScope by MainScope(),
             .level(HttpLevel.BODY)
             .writeTimeout(10)
             .readTimeout(10)
-            .addLogListener(this)
             .connectTimeout(10)
             .build(this)
 
@@ -138,8 +134,6 @@ class UploadAct : AppCompatActivity(), CoroutineScope by MainScope(),
         rxHttp.create().doUpLoadCancel(info.taskId)
     }
 
-    override fun onRxHttpLog(message: String) {
-    }
 
     override fun onUpLoadFailed(tag: String, throwable: Throwable) {
         Log.i(TAG, "failed ----> $throwable thread ${Thread.currentThread().name}")

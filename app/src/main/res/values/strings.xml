@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">RxHttp-coroutine</string>
+    <string name="param_get">GET</string>
+    <string name="param_post">POST</string>
+    <string name="param_download">下载</string>
+    <string name="param_upload">上传</string>
+    <string name="param_change_base_url">动态切换BaseURL</string>
+    <string name="param_form">表单</string>
 </resources>

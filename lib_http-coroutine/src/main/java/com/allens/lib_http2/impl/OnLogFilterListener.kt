@@ -7,11 +7,13 @@ package com.allens.lib_http2.impl
  * @CreateDate:     2019-11-22 16:24
  * @Version:        1.0
  */
-interface OnLogFilterListener {
-    fun filter(message: String): Boolean
-}
+interface OnLogListener {
+    interface OnLogFilterListener {
+        fun logFilter(message: String): Boolean
+    }
 
+    interface OnLogInterceptorListener {
+        fun onLogInterceptorInfo(message: String);
+    }
 
-interface OnLogListener{
-    fun onRxHttpLog(message: String);
 }

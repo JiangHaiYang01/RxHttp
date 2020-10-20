@@ -10,7 +10,7 @@ class HostSelectionInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
 
         var request = chain.request()
-        var headers = request.headers
+        val headers = request.headers
         return if (headers.size > 0) {
             for (info in headers) {
                 if (info.first == RequestBuilder.CHANGE_URL) {
