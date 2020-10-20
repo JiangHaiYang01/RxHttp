@@ -2,6 +2,7 @@ package com.allens.lib_http2.tools
 
 import android.os.Build
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import com.allens.lib_http2.core.HttpResult
 import com.allens.lib_http2.download.DownLoadManager
@@ -39,19 +40,23 @@ class RequestBuilder {
         return this
     }
 
+    //添加请求参数
     fun addParameter(key: String, value: Any): RequestBuilder {
         map[key] = value
         return this
     }
 
+    //切换请求的地址
     fun changeBaseUrl(url: String): RequestBuilder {
         addHeard(CHANGE_URL, url)
         return this
     }
 
 
+    //添加上传的文件
     fun addFile(key: String, file: File): RequestBuilder {
-        handler = Handler()
+        if (handler == null)
+            handler = Handler(Looper.getMainLooper())
         val fileBody: RequestBody =
             file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
         bodyMap[key] = ProgressRequestBody(null, "", fileBody, handler)
@@ -59,6 +64,7 @@ class RequestBuilder {
     }
 
 
+    //get 请求
     suspend fun <T : Any> doGet(
         parameter: String,
         tClass: Class<T>
@@ -81,9 +87,9 @@ class RequestBuilder {
         )
     }
 
+    //表单提交
     suspend fun <T : Any> doPost(parameter: String, tClass: Class<T>): HttpResult<T> {
         return executeResponse({
-            Log.i("allens", "post 方法启动 线程 ${Thread.currentThread().name}")
             HttpManager.getService(ApiService::class.java)
                 .doPost(parameter, heard, map).body()
                 ?.string()
@@ -91,6 +97,7 @@ class RequestBuilder {
     }
 
 
+    //post请求,json 的方式请求
     suspend fun <T : Any> doBody(parameter: String, tClass: Class<T>): HttpResult<T> {
         return executeResponse({
             val toJson = HttpManager.gson.toJson(map)
@@ -104,6 +111,7 @@ class RequestBuilder {
     }
 
 
+    // delete
     suspend fun <T : Any> doDelete(parameter: String, tClass: Class<T>): HttpResult<T> {
         return executeResponse({
             HttpManager.getService(ApiService::class.java)
@@ -112,6 +120,7 @@ class RequestBuilder {
         }, tClass)
     }
 
+    //put
     suspend fun <T : Any> doPut(parameter: String, tClass: Class<T>): HttpResult<T> {
         return executeResponse({
             HttpManager.getService(ApiService::class.java)
@@ -170,7 +179,7 @@ class RequestBuilder {
     }
 
 
-    //上传
+
     private suspend fun <T : Any> doUpload(url: String, tClass: Class<T>): HttpResult<T> {
         return executeResponse({
             HttpManager.getServiceFromDownLoadOrUpload(ApiService::class.java)
@@ -179,7 +188,7 @@ class RequestBuilder {
         }, tClass)
     }
 
-
+    //上传
     suspend fun <T : Any> doUpload(
         tag: String,
         url: String,
@@ -194,7 +203,7 @@ class RequestBuilder {
             withContext(Dispatchers.Main) {
                 listener.opUploadPrepare(tag)
             }
-             doUpload(url, tClass)
+            doUpload(url, tClass)
                 .result(
                     {
                         listener.onUpLoadSuccess(tag, it)
