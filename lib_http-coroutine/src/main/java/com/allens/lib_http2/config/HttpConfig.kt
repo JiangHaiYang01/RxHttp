@@ -62,7 +62,6 @@ enum class HttpLevel {
                 NONE -> HttpLoggingInterceptor.Level.NONE
                 BASIC -> HttpLoggingInterceptor.Level.BASIC
                 HEADERS -> HttpLoggingInterceptor.Level.HEADERS
-                else -> HttpLoggingInterceptor.Level.BODY
             }
         }
     }
