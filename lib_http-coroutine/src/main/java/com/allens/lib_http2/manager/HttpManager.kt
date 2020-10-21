@@ -173,7 +173,7 @@ object HttpManager {
 
 
     //获取更路径
-    private fun getBasePath(context: Context): String {
+    public fun getBasePath(context: Context): String {
         var p: String = Environment.getExternalStorageState()
         val f: File? = context.getExternalFilesDir(null)
         if (null != f) {

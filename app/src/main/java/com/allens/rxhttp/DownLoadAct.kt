@@ -12,6 +12,7 @@ import com.allens.lib_http2.RxHttp
 import com.allens.lib_http2.config.HttpLevel
 import com.allens.lib_http2.download.utils.FileTool
 import com.allens.lib_http2.impl.OnDownLoadListener
+import com.allens.lib_http2.manager.HttpManager
 import kotlinx.android.synthetic.main.activity_dowload.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
@@ -112,7 +113,7 @@ class DownLoadAct : AppCompatActivity(), CoroutineScope by MainScope(),
     }
 
     private suspend fun startDownLoad(info: DownLoadInfo) {
-        rxHttp.create().doDownLoad(info.taskId, info.url, getBasePath(this), info.saveName, this)
+        rxHttp.create().doDownLoad(info.taskId, info.url, HttpManager.getBasePath(this), info.saveName, this)
     }
 
     private fun pauseDownLoad(info: DownLoadInfo) {
@@ -170,15 +171,6 @@ class DownLoadAct : AppCompatActivity(), CoroutineScope by MainScope(),
     }
 
 
-    //获取更路径
-    private fun getBasePath(context: Context): String {
-        var p: String = Environment.getExternalStorageDirectory().path
-        val f: File? = context.getExternalFilesDir(null)
-        if (null != f) {
-            p = f.absolutePath
-        }
-        return p
-    }
 
 
 }

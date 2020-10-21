@@ -96,7 +96,11 @@ class RequestBuilder {
     }
 
 
-    //get 请求
+    /**
+     * get 请求
+     * [parameter] 请求地址,跟在BaseUrl 后面的
+     * [tClass]    需要转成的模型类
+     */
     suspend fun <T : Any> doGet(
         parameter: String,
         tClass: Class<T>
@@ -119,7 +123,11 @@ class RequestBuilder {
         )
     }
 
-    //表单提交
+    /**
+     * 表单提交
+     * [parameter] 请求地址,跟在BaseUrl 后面的
+     * [tClass]    需要转成的模型类
+     */
     suspend fun <T : Any> doPost(parameter: String, tClass: Class<T>): HttpResult<T> {
         return executeResponse({
             HttpManager.getService(ApiService::class.java)
@@ -129,7 +137,11 @@ class RequestBuilder {
     }
 
 
-    //post请求,json 的方式请求
+    /**
+     * post请求,json 的方式请求
+     * [parameter] 请求地址,跟在BaseUrl 后面的
+     * [tClass]    需要转成的模型类
+     */
     suspend fun <T : Any> doBody(parameter: String, tClass: Class<T>): HttpResult<T> {
         return executeResponse({
             val toJson = HttpManager.gson.toJson(map)
@@ -143,7 +155,11 @@ class RequestBuilder {
     }
 
 
-    // delete
+    /**
+     * delete 请求
+     * [parameter] 请求地址,跟在BaseUrl 后面的
+     * [tClass]    需要转成的模型类
+     */
     suspend fun <T : Any> doDelete(parameter: String, tClass: Class<T>): HttpResult<T> {
         return executeResponse({
             HttpManager.getService(ApiService::class.java)
@@ -152,7 +168,11 @@ class RequestBuilder {
         }, tClass)
     }
 
-    //put
+    /**
+     * put 请求
+     * [parameter] 请求地址,跟在BaseUrl 后面的
+     * [tClass]    需要转成的模型类
+     */
     suspend fun <T : Any> doPut(parameter: String, tClass: Class<T>): HttpResult<T> {
         return executeResponse({
             HttpManager.getService(ApiService::class.java)
@@ -176,26 +196,41 @@ class RequestBuilder {
     }
 
 
-    //下载
+    /***
+     * 开始下载文件
+     * [key]            tag 每一个下载任务需要传入不同的tag,否则会找不到对应的下载task
+     * [url]            下载URL
+     * [savePath]       保存的位置
+     * [saveName]       下载文件保存的名称
+     * [loadListener]   下载监听回调
+     */
     suspend fun doDownLoad(
-        tag: String,
+        key: String,
         url: String,
         savePath: String,
         saveName: String,
         loadListener: OnDownLoadListener
     ) {
         DownLoadManager.downLoad(
-            tag, url, savePath, saveName, loadListener = loadListener
+            key, url, savePath, saveName, loadListener = loadListener
         )
     }
 
 
-    //下载 cancel
+    /***
+     * 取消下载
+     * [key] 启动下载时候的tag
+     * 取消下载会在 [OnDownLoadListener] 中触发 [OnDownLoadListener.onDownLoadCancel]
+     */
     fun doDownLoadCancel(key: String) {
         DownLoadManager.cancel(key)
     }
 
-    //暂停下载
+    /***
+     * 暂停下载
+     * [key] 启动下载时候的tag
+     * 暂停下载会在 [OnDownLoadListener] 中触发 [OnDownLoadListener.onDownLoadPause]
+     */
     fun doDownLoadPause(key: String) {
         DownLoadManager.pause(key)
     }
@@ -219,7 +254,13 @@ class RequestBuilder {
         }, tClass)
     }
 
-    //上传
+    /***
+     * 上传文件
+     * [tag]            上传的tag 此任务的唯一标识
+     * [url]            上传的地址
+     * [tClass]         模型对象
+     * [listener]       上传回调
+     */
     suspend fun <T : Any> doUpload(
         tag: String,
         url: String,
@@ -246,6 +287,10 @@ class RequestBuilder {
         }
     }
 
+    /***
+     * 取消上传
+     * [tag]  上传任务的tag
+     */
     fun doUpLoadCancel(tag: String) {
         UpLoadPool.getListener(tag)?.onUploadCancel(tag)
         UpLoadPool.remove(tag)
