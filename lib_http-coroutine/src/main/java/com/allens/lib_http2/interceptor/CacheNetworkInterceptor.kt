@@ -35,7 +35,6 @@ internal class CacheNetworkInterceptor : Interceptor {
             }
         }
         RxHttpLogTool.i(
-            RxHttp.TAG,
             "http---->  addNetworkInterceptor " + if (time == 0) {
                 "每次都请求实时数据"
             } else {

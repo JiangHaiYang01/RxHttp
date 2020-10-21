@@ -36,9 +36,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope(),
             .isLog(true)  //是否打印log
             .level(HttpLevel.BODY)      //日志级别
             .addLogInterceptorListener(this) //日志拦截器的日志信息
-            .writeTimeout(10)  //超时
-            .readTimeout(10)
-            .connectTimeout(10)
+            .writeTimeout(9)  //超时
+            .readTimeout(9)
+            .connectTimeout(9)
             .retryOnConnectionFailure(true)//是否重试
             .addFactoryListener(object : OnFactoryListener {
                 //添加自定义的 Converter.Factory
@@ -80,6 +80,11 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope(),
         btn_change_base_url.setOnClickListener {
             log.text = ""
             changeUrlRequest()
+        }
+
+        btn_change_time_out.setOnClickListener {
+            log.text = ""
+            changeTimeOutRequest()
         }
     }
 
@@ -125,7 +130,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope(),
         launch {
             rxHttp
                 .create()
-                .changeBaseUrl("http://localhost")
+                .dynamicBaseUrl("http://localhost")
                 .addParameter("k", "java")
                 .doGet(parameter = "wxarticle/chapters/json", tClass = TestBean::class.java)
                 .result({
@@ -135,6 +140,27 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope(),
                     Log.i(TAG, "error ${Thread.currentThread().name} info ${it.toString()} ")
 //                    log.text = it.toString()
                 })
+        }
+    }
+  private fun changeTimeOutRequest() {
+        launch {
+            rxHttp
+                .create()
+                .dynamicConnectTimeOut(100)
+                .dynamicReadTimeOut(100)
+                .dynamicWriteTimeOut(100)
+                .addParameter("title", "123456")
+                .addParameter("author", "123456")
+                .addParameter("link", "123456")
+                .doBody("lg/collect/add/json", TestBean::class.java)
+                .result(
+                    {
+//                        log.text = it.toString()
+                    },
+                    {
+//                        log.text = it.message.toString()
+                    }
+                )
         }
     }
 
@@ -156,6 +182,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope(),
     }
 
     override fun onLogInterceptorInfo(message: String) {
-        log.append(message + "\n")
+//        log.append(message + "\n")
     }
 }

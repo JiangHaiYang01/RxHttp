@@ -35,7 +35,6 @@ internal class CacheInterceptor(private val context: Context) : Interceptor {
                 }
             }
             RxHttpLogTool.i(
-                RxHttp.TAG,
                 "http---->  无网络 离线缓存 " + if (time != HttpConfig.cacheNoNetworkTimeOut) {
                     "无限时请求有网请求好的数据"
                 } else {

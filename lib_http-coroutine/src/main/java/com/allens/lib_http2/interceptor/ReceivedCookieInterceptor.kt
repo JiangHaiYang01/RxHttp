@@ -5,6 +5,13 @@ import okhttp3.Interceptor
 import okhttp3.Response
 
 //cookie 拦截器
+object ReceivedCookieInterceptor {
+    fun register(listener: OnCookieListener, interceptor: OnCookieInterceptor): Interceptor {
+        return ReceivedCookiesInterceptorImpl(listener, interceptor)
+    }
+}
+
+
 class ReceivedCookiesInterceptorImpl(
     private val listener: OnCookieListener,
     private val interceptor: OnCookieInterceptor
@@ -36,13 +43,6 @@ class ReceivedCookiesInterceptorImpl(
         }
     }
 }
-
-object ReceivedCookieInterceptor {
-    fun register(listener: OnCookieListener, interceptor: OnCookieInterceptor): Interceptor {
-        return ReceivedCookiesInterceptorImpl(listener, interceptor)
-    }
-}
-
 
 interface OnCookieListener {
     fun onCookies(cookie: HashSet<String>)

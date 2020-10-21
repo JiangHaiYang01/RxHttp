@@ -39,7 +39,7 @@ object FileTool {
         try {
             if (filePath == null) {
                 if (HttpConfig.isLog)
-                    RxHttpLogTool.i(TAG, "mkdirs file [$savePath]  error")
+                    RxHttpLogTool.i("mkdirs file [$savePath]  error")
                 withContext(Dispatchers.Main) {
                     loadListener.onDownLoadError(key, Throwable("mkdirs file [$savePath]  error"))
                 }

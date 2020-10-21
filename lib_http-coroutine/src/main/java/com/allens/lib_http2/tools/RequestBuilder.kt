@@ -20,6 +20,7 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 class RequestBuilder {
@@ -30,7 +31,12 @@ class RequestBuilder {
 
 
     companion object {
-        val CHANGE_URL = Build.BRAND + "_" + Build.MODEL + "_" + "CHANGE_URL"
+        val DYNAMIC_URL = Build.BRAND + "_" + Build.MODEL + "_" + "DYNAMIC_URL"
+        val DYNAMIC_CONNECT_TIME_OUT =
+            Build.BRAND + "_" + Build.MODEL + "_" + "DYNAMIC_CONNECT_TIME_OUT"
+        val DYNAMIC_WRITE_TIME_OUT =
+            Build.BRAND + "_" + Build.MODEL + "_" + "DYNAMIC_WRITE_TIME_OUT"
+        val DYNAMIC_READ_TIME_OUT = Build.BRAND + "_" + Build.MODEL + "_" + "DYNAMIC_READ_TIME_OUT"
     }
 
     private var handler: Handler? = null
@@ -38,7 +44,6 @@ class RequestBuilder {
     //添加请求头
     fun addHeard(key: String, value: String): RequestBuilder {
         heard[key] = value
-
         return this
     }
 
@@ -48,12 +53,40 @@ class RequestBuilder {
         return this
     }
 
-    //切换请求的地址
-    fun changeBaseUrl(url: String): RequestBuilder {
-        addHeard(CHANGE_URL, url)
+    /***
+     * 动态切换请求的地址
+     * 这里的heard 会在 [com.allens.lib_http2.interceptor.DynamicBaseUrlInterceptor] 中进行判断 然后删除
+     */
+    fun dynamicBaseUrl(url: String): RequestBuilder {
+        addHeard(DYNAMIC_URL, url)
         return this
     }
 
+    /***
+     * 动态切换connect time [timeout] 毫秒单位
+     */
+    fun dynamicConnectTimeOut(timeout: Int): RequestBuilder {
+        addHeard(DYNAMIC_CONNECT_TIME_OUT, timeout.toString())
+        return this
+    }
+
+    /***
+     * 动态切换write time [timeout] 毫秒单位
+     */
+    fun dynamicWriteTimeOut(timeout: Int): RequestBuilder {
+        addHeard(DYNAMIC_WRITE_TIME_OUT, timeout.toString())
+        return this
+    }
+
+    /***
+     * 动态切换read time [timeout] 毫秒单位
+     * 这里的heard 会在 [com.allens.lib_http2.interceptor.DynamicTimeoutInterceptor] 中进行判断 然后删除
+     * 不会正在的请求中触发
+     */
+    fun dynamicReadTimeOut(timeout: Int): RequestBuilder {
+        addHeard(DYNAMIC_READ_TIME_OUT, timeout.toString())
+        return this
+    }
 
     //添加上传的文件
     fun addFile(key: String, file: File): RequestBuilder {
@@ -73,7 +106,7 @@ class RequestBuilder {
     ): HttpResult<T> {
         return executeResponse(
             {
-                val baseUrl = HttpManager.retrofit.baseUrl().toUrl().toString()
+                val baseUrl = HttpManager.retrofit.baseUrl().toString()
                 var getUrl: String = baseUrl + parameter
                 if (map.size > 0) {
                     val param: String = UrlTool.prepareParam(map)
@@ -179,7 +212,6 @@ class RequestBuilder {
     fun doDownLoadCancelAll() {
         DownLoadManager.doDownLoadCancelAll()
     }
-
 
 
     private suspend fun <T : Any> doUpload(url: String, tClass: Class<T>): HttpResult<T> {

@@ -25,7 +25,7 @@ object LogInterceptor {
                         return
                     }
                 }
-                RxHttpLogTool.i(RxHttp.TAG, "http----> $message ")
+                RxHttpLogTool.i( "http----> $message ")
                 if (HttpConfig.isLog)
                     HttpConfig.logListener?.onLogInterceptorInfo(message)
             }

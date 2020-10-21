@@ -73,11 +73,16 @@ object HttpManager {
 
 
         //动态替换BaseURL
-        okHttpBuilder.addInterceptor(HostSelectionInterceptor())
+        okHttpBuilder.addInterceptor(DynamicBaseUrlInterceptor)
+        //动态替换连接超时
+        okHttpBuilder.addInterceptor(DynamicTimeoutInterceptor)
 
+        //添加日志拦截器
         if (HttpConfig.isLog)
             okHttpBuilder.addInterceptor(LogInterceptor.register(HttpConfig.level))
         val map = HttpConfig.heardMap
+
+        //添加请求头
         if (!map.isNullOrEmpty()) {
             okHttpBuilder.addInterceptor(HeardInterceptor.register(map))
         }
@@ -123,21 +128,21 @@ object HttpManager {
         callAdapterFactorySet?.forEach {
             try {
                 client.addCallAdapterFactory(it)
-                RxHttpLogTool.i(RxHttp.TAG, "addCallAdapterFactory $it")
+                RxHttpLogTool.i( "addCallAdapterFactory $it")
             } catch (throwable: Throwable) {
-                RxHttpLogTool.i(RxHttp.TAG, "add factory failed ${throwable.message}")
+                RxHttpLogTool.i( "add factory failed ${throwable.message}")
             }
         }
 
 
         val converterFactorySet = HttpConfig.onFactoryListener?.addConverterFactory()
-        RxHttpLogTool.i(RxHttp.TAG, "converterFactorySet size  ${converterFactorySet?.size}")
+        RxHttpLogTool.i( "converterFactorySet size  ${converterFactorySet?.size}")
         converterFactorySet?.forEach {
             try {
                 client.addConverterFactory(it)
-                RxHttpLogTool.i(RxHttp.TAG, "addConverterFactory $it")
+                RxHttpLogTool.i( "addConverterFactory $it")
             } catch (throwable: Throwable) {
-                RxHttpLogTool.i(RxHttp.TAG, "add converterFactory failed ${throwable.message}")
+                RxHttpLogTool.i( "add converterFactory failed ${throwable.message}")
             }
         }
         return client
