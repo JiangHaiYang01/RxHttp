@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.allens.lib_http2.RxHttp
 import com.allens.lib_http2.config.HttpLevel
-import com.allens.lib_http2.impl.OnLogListener
+import com.allens.lib_http2.download.utils.FileTool
 import com.allens.lib_http2.impl.OnUpLoadListener
 import kotlinx.android.synthetic.main.activity_upload.mRecyclerView
 import kotlinx.coroutines.CoroutineScope
@@ -22,7 +22,7 @@ import java.io.File
 
 
 class UploadAct : AppCompatActivity(), CoroutineScope by MainScope(),
-    UploadAdapter.OnBtnClickListener, OnLogListener, OnUpLoadListener<TestBean>{
+    UploadAdapter.OnBtnClickListener, OnUpLoadListener<TestBean>{
 
     private lateinit var rxHttp: RxHttp
 
@@ -148,15 +148,16 @@ class UploadAct : AppCompatActivity(), CoroutineScope by MainScope(),
     ) {
         Log.i(
             TAG,
-            "progress ----> bytesWriting ${rxHttp.bytes2kb(bytesWriting)} totalBytes ${rxHttp.bytes2kb(
+            "progress ----> bytesWriting ${  FileTool.bytes2kb(bytesWriting)} " +
+                    "totalBytes ${FileTool.bytes2kb(
                 totalBytes
             )} progress $progress  thread ${Thread.currentThread().name}"
         )
         myAdapter.uploadProgress(
             tag,
             progress,
-            rxHttp.bytes2kb(bytesWriting),
-            rxHttp.bytes2kb(totalBytes)
+            FileTool.bytes2kb(bytesWriting),
+            FileTool.bytes2kb(totalBytes)
         )
     }
 

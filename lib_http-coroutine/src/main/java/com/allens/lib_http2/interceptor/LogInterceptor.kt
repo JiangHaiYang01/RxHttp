@@ -3,6 +3,7 @@ package com.allens.lib_http2.interceptor
 import com.allens.lib_http2.RxHttp
 import com.allens.lib_http2.config.HttpConfig
 import com.allens.lib_http2.config.HttpLevel
+import com.allens.lib_http2.manager.HttpManager
 import com.allens.lib_http2.tools.RxHttpLogTool
 import okhttp3.logging.HttpLoggingInterceptor
 
@@ -19,15 +20,12 @@ object LogInterceptor {
     fun register(level: HttpLevel): HttpLoggingInterceptor {
         val interceptor = HttpLoggingInterceptor(object : HttpLoggingInterceptor.Logger {
             override fun log(message: String) {
-                val logFilterListener = HttpConfig.logFilterListener
-                if (logFilterListener != null) {
-                    if (logFilterListener.logFilter(message)) {
-                        return
+                RxHttpLogTool.i("http----> $message ")
+                if (HttpConfig.isLog) {
+                    HttpManager.handler.post {
+                        HttpConfig.logListener?.onLogInterceptorInfo(message)
                     }
                 }
-                RxHttpLogTool.i( "http----> $message ")
-                if (HttpConfig.isLog)
-                    HttpConfig.logListener?.onLogInterceptorInfo(message)
             }
         })
         interceptor.level = HttpLevel.conversion(level)

@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.allens.lib_http2.RxHttp
 import com.allens.lib_http2.config.HttpLevel
+import com.allens.lib_http2.download.utils.FileTool
 import com.allens.lib_http2.impl.OnDownLoadListener
 import kotlinx.android.synthetic.main.activity_dowload.*
 import kotlinx.coroutines.CoroutineScope
@@ -157,8 +158,8 @@ class DownLoadAct : AppCompatActivity(), CoroutineScope by MainScope(),
         myAdapter.setDownLoadProgress(
             key,
             progress,
-            rxHttp.bytes2kb(read),
-            rxHttp.bytes2kb(count),
+            FileTool.bytes2kb(read),
+            FileTool.bytes2kb(count),
             done
         )
     }

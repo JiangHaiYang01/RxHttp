@@ -2,8 +2,8 @@ package com.allens.lib_http2.config
 
 import com.allens.lib_http2.impl.OnFactoryListener
 import com.allens.lib_http2.impl.OnCookieInterceptor
+import com.allens.lib_http2.impl.OnLogInterceptorListener
 import com.allens.lib_http2.interceptor.OnCookieListener
-import com.allens.lib_http2.impl.OnLogListener
 import okhttp3.logging.HttpLoggingInterceptor
 
 /**
@@ -25,8 +25,7 @@ open class HttpConfig {
 
         var isLog: Boolean = true
         var level: HttpLevel = HttpLevel.BODY
-        var logFilterListener: OnLogListener.OnLogFilterListener? = null
-        var logListener: OnLogListener.OnLogInterceptorListener? = null
+        var logListener: OnLogInterceptorListener? = null
 
 
         var onFactoryListener: OnFactoryListener? = null

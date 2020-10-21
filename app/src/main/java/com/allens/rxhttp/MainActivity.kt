@@ -8,7 +8,7 @@ import android.util.Log
 import com.allens.lib_http2.RxHttp
 import com.allens.lib_http2.config.HttpLevel
 import com.allens.lib_http2.impl.OnFactoryListener
-import com.allens.lib_http2.impl.OnLogListener
+import com.allens.lib_http2.impl.OnLogInterceptorListener
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import retrofit2.CallAdapter
@@ -17,7 +17,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : AppCompatActivity(), CoroutineScope by MainScope(),
-    OnLogListener.OnLogInterceptorListener {
+    OnLogInterceptorListener {
 
     companion object {
         const val TAG = "Main"
@@ -36,9 +36,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope(),
             .isLog(true)  //是否打印log
             .level(HttpLevel.BODY)      //日志级别
             .addLogInterceptorListener(this) //日志拦截器的日志信息
-            .writeTimeout(9)  //超时
-            .readTimeout(9)
-            .connectTimeout(9)
+            .writeTimeout(10)  //超时
+            .readTimeout(10)
+            .connectTimeout(10)
             .retryOnConnectionFailure(true)//是否重试
             .addFactoryListener(object : OnFactoryListener {
                 //添加自定义的 Converter.Factory
@@ -142,13 +142,14 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope(),
                 })
         }
     }
-  private fun changeTimeOutRequest() {
+
+    private fun changeTimeOutRequest() {
         launch {
             rxHttp
                 .create()
-                .dynamicConnectTimeOut(100)
-                .dynamicReadTimeOut(100)
-                .dynamicWriteTimeOut(100)
+                .dynamicConnectTimeOut(10)
+                .dynamicReadTimeOut(10)
+                .dynamicWriteTimeOut(10)
                 .addParameter("title", "123456")
                 .addParameter("author", "123456")
                 .addParameter("link", "123456")
@@ -182,6 +183,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope(),
     }
 
     override fun onLogInterceptorInfo(message: String) {
-//        log.append(message + "\n")
+        log.append(message + "\n")
     }
 }

@@ -39,7 +39,6 @@ class RequestBuilder {
         val DYNAMIC_READ_TIME_OUT = Build.BRAND + "_" + Build.MODEL + "_" + "DYNAMIC_READ_TIME_OUT"
     }
 
-    private var handler: Handler? = null
 
     //添加请求头
     fun addHeard(key: String, value: String): RequestBuilder {
@@ -90,11 +89,9 @@ class RequestBuilder {
 
     //添加上传的文件
     fun addFile(key: String, file: File): RequestBuilder {
-        if (handler == null)
-            handler = Handler(Looper.getMainLooper())
         val fileBody: RequestBody =
             file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
-        bodyMap[key] = ProgressRequestBody(null, "", fileBody, handler)
+        bodyMap[key] = ProgressRequestBody(null, "", fileBody, HttpManager.handler)
         return this
     }
 
@@ -231,7 +228,7 @@ class RequestBuilder {
     ) {
         withContext(Dispatchers.IO) {
             for ((key, value) in bodyMap) {
-                bodyMap[key] = ProgressRequestBody(listener, tag, value.getRequestBody(), handler)
+                bodyMap[key] = ProgressRequestBody(listener, tag, value.getRequestBody(), HttpManager.handler)
             }
             UpLoadPool.add(tag, listener, this)
             withContext(Dispatchers.Main) {

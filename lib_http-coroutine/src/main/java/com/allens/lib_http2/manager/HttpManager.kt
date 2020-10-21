@@ -2,6 +2,8 @@ package com.allens.lib_http2.manager
 
 import android.content.Context
 import android.os.Environment
+import android.os.Handler
+import android.os.Looper
 import com.allens.lib_http2.RxHttp
 import com.allens.lib_http2.config.HttpConfig
 import com.allens.lib_http2.config.HttpNetWorkType
@@ -30,6 +32,7 @@ import java.util.concurrent.TimeUnit
 object HttpManager {
 
 
+    val handler = Handler(Looper.getMainLooper())
     lateinit var context: Context
 
     fun create(): HttpManager {
@@ -103,8 +106,7 @@ object HttpManager {
         val cache = Cache(
             File(
                 if (HttpConfig.cachePath.isEmpty()) {
-                    HttpConfig.cachePath = getBasePath(context) + "/cacheHttp"
-                    HttpConfig.cachePath
+                    getBasePath(context) + "/cacheHttp"
                 } else {
                     HttpConfig.cachePath
                 }
@@ -172,7 +174,7 @@ object HttpManager {
 
     //获取更路径
     private fun getBasePath(context: Context): String {
-        var p: String = Environment.getExternalStorageDirectory().path
+        var p: String = Environment.getExternalStorageState()
         val f: File? = context.getExternalFilesDir(null)
         if (null != f) {
             p = f.absolutePath

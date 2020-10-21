@@ -75,5 +75,5 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:scrollbars="vertical"
-        android:textSize="10sp" />
+        android:textSize="12sp" />
 </LinearLayout>
