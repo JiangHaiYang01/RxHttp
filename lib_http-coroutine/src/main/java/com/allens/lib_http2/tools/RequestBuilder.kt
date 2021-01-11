@@ -1,7 +1,6 @@
 package com.allens.lib_http2.tools
 
 import android.os.Build
-import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import com.allens.lib_http2.core.HttpResult
@@ -30,14 +29,6 @@ class RequestBuilder {
     private val bodyMap = HashMap<String, ProgressRequestBody>()
 
 
-    companion object {
-        val DYNAMIC_URL = Build.BRAND + "_" + Build.MODEL + "_" + "DYNAMIC_URL"
-        val DYNAMIC_CONNECT_TIME_OUT =
-            Build.BRAND + "_" + Build.MODEL + "_" + "DYNAMIC_CONNECT_TIME_OUT"
-        val DYNAMIC_WRITE_TIME_OUT =
-            Build.BRAND + "_" + Build.MODEL + "_" + "DYNAMIC_WRITE_TIME_OUT"
-        val DYNAMIC_READ_TIME_OUT = Build.BRAND + "_" + Build.MODEL + "_" + "DYNAMIC_READ_TIME_OUT"
-    }
 
 
     //添加请求头
@@ -57,33 +48,37 @@ class RequestBuilder {
      * 这里的heard 会在 [com.allens.lib_http2.interceptor.DynamicBaseUrlInterceptor] 中进行判断 然后删除
      */
     fun dynamicBaseUrl(url: String): RequestBuilder {
-        addHeard(DYNAMIC_URL, url)
+        addHeard(DynamicHeard.DYNAMIC_URL, url)
         return this
     }
 
     /***
-     * 动态切换connect time [timeout] 毫秒单位
+     * 动态切换connect time
+     * 会在 [com.allens.lib_http2.interceptor.DynamicTimeoutInterceptor] 中进行判断然后删除
      */
-    fun dynamicConnectTimeOut(timeout: Int): RequestBuilder {
-        addHeard(DYNAMIC_CONNECT_TIME_OUT, timeout.toString())
+    fun dynamicConnectTimeOut(timeout: Int,timeUnit: TimeUnit = TimeUnit.MILLISECONDS): RequestBuilder {
+        addHeard(DynamicHeard.DYNAMIC_CONNECT_TIME_OUT, timeout.toString())
+        addHeard(DynamicHeard.DYNAMIC_CONNECT_TIME_OUT_TimeUnit, DynamicHeard.timeUnitConvert(timeUnit).info)
         return this
     }
 
     /***
-     * 动态切换write time [timeout] 毫秒单位
+     * 动态切换write time
+     * 会在 [com.allens.lib_http2.interceptor.DynamicTimeoutInterceptor] 中进行判断然后删除
      */
-    fun dynamicWriteTimeOut(timeout: Int): RequestBuilder {
-        addHeard(DYNAMIC_WRITE_TIME_OUT, timeout.toString())
+    fun dynamicWriteTimeOut(timeout: Int,timeUnit: TimeUnit = TimeUnit.MILLISECONDS): RequestBuilder {
+        addHeard(DynamicHeard.DYNAMIC_WRITE_TIME_OUT, timeout.toString())
+        addHeard(DynamicHeard.DYNAMIC_WRITE_TIME_OUT_TimeUnit, DynamicHeard.timeUnitConvert(timeUnit).info)
         return this
     }
 
     /***
-     * 动态切换read time [timeout] 毫秒单位
+     * 动态切换read time
      * 这里的heard 会在 [com.allens.lib_http2.interceptor.DynamicTimeoutInterceptor] 中进行判断 然后删除
-     * 不会正在的请求中触发
      */
-    fun dynamicReadTimeOut(timeout: Int): RequestBuilder {
-        addHeard(DYNAMIC_READ_TIME_OUT, timeout.toString())
+    fun dynamicReadTimeOut(timeout: Int,timeUnit: TimeUnit = TimeUnit.MILLISECONDS): RequestBuilder {
+        addHeard(DynamicHeard.DYNAMIC_READ_TIME_OUT, timeout.toString())
+        addHeard(DynamicHeard.DYNAMIC_READ_TIME_OUT_TimeUnit, DynamicHeard.timeUnitConvert(timeUnit).info)
         return this
     }
 
@@ -187,9 +182,7 @@ class RequestBuilder {
         tClass: Class<T>
     ): HttpResult<T> {
         return try {
-            withContext(Dispatchers.IO) {
-                HttpResult.Success(HttpManager.gson.fromJson(call(), tClass))
-            }
+            HttpResult.Success(HttpManager.gson.fromJson(call(), tClass))
         } catch (e: Throwable) {
             HttpResult.Error(e)
         }
@@ -269,7 +262,8 @@ class RequestBuilder {
     ) {
         withContext(Dispatchers.IO) {
             for ((key, value) in bodyMap) {
-                bodyMap[key] = ProgressRequestBody(listener, tag, value.getRequestBody(), HttpManager.handler)
+                bodyMap[key] =
+                    ProgressRequestBody(listener, tag, value.getRequestBody(), HttpManager.handler)
             }
             UpLoadPool.add(tag, listener, this)
             withContext(Dispatchers.Main) {

@@ -42,7 +42,7 @@ class UploadAct : AppCompatActivity(), CoroutineScope by MainScope(),
 
         rxHttp = RxHttp.Builder()
             .baseUrl("https://www.wanandroid.com")
-            .isLog(true)
+            .isDebug(true)
             .level(HttpLevel.BODY)
             .writeTimeout(10)
             .readTimeout(10)

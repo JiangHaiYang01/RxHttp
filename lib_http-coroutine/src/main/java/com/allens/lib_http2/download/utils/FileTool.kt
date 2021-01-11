@@ -14,7 +14,6 @@ import java.nio.channels.FileChannel
 import java.text.DecimalFormat
 
 object FileTool {
-    private const val TAG = RxHttp.TAG
 
 
     //定义GB的计算常量
@@ -38,8 +37,7 @@ object FileTool {
         val filePath = getFilePath(savePath, saveName)
         try {
             if (filePath == null) {
-                if (HttpConfig.isLog)
-                    RxHttpLogTool.i("mkdirs file [$savePath]  error")
+                RxHttpLogTool.i("mkdirs file [$savePath]  error")
                 withContext(Dispatchers.Main) {
                     loadListener.onDownLoadError(key, Throwable("mkdirs file [$savePath]  error"))
                 }

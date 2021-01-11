@@ -2,13 +2,13 @@ package com.allens.lib_http2
 
 import android.content.Context
 import com.allens.lib_http2.config.*
-import com.allens.lib_http2.download.utils.FileTool
 import com.allens.lib_http2.impl.*
 import com.allens.lib_http2.interceptor.OnCookieListener
 import com.allens.lib_http2.manager.HttpManager
 import com.allens.lib_http2.tools.RequestBuilder
 import retrofit2.CallAdapter
 import retrofit2.Converter
+import java.util.concurrent.TimeUnit
 import kotlin.collections.HashMap
 
 
@@ -24,16 +24,22 @@ class RxHttp {
 
     companion object {
         const val TAG = "RxHttp"
+        var isDebug = false
     }
 
 
     class Builder {
+
+
+        private val httpConfig = HttpConfig()
+
         /***
          * 配置通用的 超时时间
          * [time] 单位秒
          */
-        fun writeTimeout(time: Long): Builder {
-            HttpConfig.writeTime = time
+        fun writeTimeout(time: Long, timeUnit: TimeUnit = TimeUnit.SECONDS): Builder {
+            httpConfig.writeTime = time
+            httpConfig.writeTimeTimeUnit = timeUnit
             return this
         }
 
@@ -41,8 +47,9 @@ class RxHttp {
          * 配置通用的 超时时间
          * [time] 单位秒
          */
-        fun readTimeout(time: Long): Builder {
-            HttpConfig.readTime = time
+        fun readTimeout(time: Long, timeUnit: TimeUnit = TimeUnit.SECONDS): Builder {
+            httpConfig.readTime = time
+            httpConfig.readTimeTimeUnit = timeUnit
             return this
         }
 
@@ -50,69 +57,79 @@ class RxHttp {
          * 配置通用的 超时时间
          * [time] 单位秒
          */
-        fun connectTimeout(time: Long): Builder {
-            HttpConfig.connectTime = time
+        fun connectTimeout(time: Long, timeUnit: TimeUnit = TimeUnit.SECONDS): Builder {
+            httpConfig.connectTime = time
+            httpConfig.connectTimeTimeUnit = timeUnit
             return this
         }
 
+        /***
+         * 是否重试
+         */
         fun retryOnConnectionFailure(retryOnConnectionFailure: Boolean): Builder {
-            HttpConfig.retryOnConnectionFailure = retryOnConnectionFailure
-            return this
-        }
-
-        /***
-         * 是否显示log
-         * 1.
-         * 使用 [addLogInterceptorListener] 方法
-         * 可以获取到 日志拦截器[com.allens.lib_http2.interceptor.LogInterceptor]中获取的数据
-         *
-         * 2. 在[com.allens.lib_http2.tools.RxHttpLogTool] 中 可以查看一些记录的日志，方便调试
-         * [isLog] true 显示log
-         */
-        fun isLog(isLog: Boolean): Builder {
-            HttpConfig.isLog = isLog
-            return this
-        }
-
-        fun level(level: HttpLevel): Builder {
-            HttpConfig.level = level
-            return this
-        }
-
-
-        /***
-         * 返回日志的信息
-         */
-        fun addLogInterceptorListener(logListener: OnLogInterceptorListener): Builder {
-            HttpConfig.logListener = logListener
+            httpConfig.retryOnConnectionFailure = retryOnConnectionFailure
             return this
         }
 
 
         /**
-         * retrofit2 中的工厂方法，能够为其添加额外的 [Converter.Factory] 或者 [CallAdapter.Factory]
+         * debug 模式 显示请求信息
          */
-        fun addFactoryListener(listener: OnFactoryListener): Builder {
-            HttpConfig.onFactoryListener = listener
+        fun isDebug(isDebug: Boolean): Builder {
+            RxHttp.isDebug = isDebug
             return this
         }
 
         /***
-         * 为所有请求都添加heard
+         * 日志级别
          */
-        fun addHead(listener: OnHeardListener): Builder {
-            val hashMap = HashMap<String, String>()
-            listener.onHeardMap(hashMap)
-            HttpConfig.heardMap = hashMap
+        fun level(level: HttpLevel): Builder {
+            httpConfig.level = level
             return this
         }
 
+
+        /***
+         * 添加日志组件，会在[OnLogInterceptorListener] 接口返回框架日志信息
+         */
+        fun addLogInterceptor(logListener: OnLogInterceptorListener): Builder {
+            httpConfig.logSet.add(logListener)
+            return this
+        }
+
+
+        /***
+         * 添加自定义的[Converter.Factory]
+         */
+        fun addConverterFactory(factory: Converter.Factory): Builder {
+            httpConfig.converterFactorySet.add(factory)
+            return this
+        }
+
+        /***
+         * 添加自定义的[CallAdapter.Factory]
+         */
+        fun addCallAdapterFactory(factory: CallAdapter.Factory): Builder {
+            httpConfig.callAdapterFactorySet.add(factory)
+            return this
+        }
+
+
+        /***
+         * 为所有请求都添加heard
+         */
+        fun addHead(key:String,value:String): Builder {
+            httpConfig.heardMap[key]= value
+            return this
+        }
+
+        /**
+         * 添加 cookie 拦截
+         */
         fun addCookieInterceptor(
-            cookieListener: OnCookieListener,
             onCookieInterceptor: OnCookieInterceptor
         ): Builder {
-            HttpConfig.cookieListener = cookieListener
-            HttpConfig.onCookieInterceptor = onCookieInterceptor
+            httpConfig.cookieSet.add(onCookieInterceptor)
             return this
         }
 
@@ -122,7 +139,7 @@ class RxHttp {
          * 为某一个请求单独配置
          */
         fun baseUrl(url: String): Builder {
-            HttpConfig.baseUrl = url
+            httpConfig.baseUrl = url
             return this
         }
 
@@ -138,7 +155,7 @@ class RxHttp {
          * 实际上只是在请求的时候带上请求头 [max-age=time] max-age:最大缓存时间
          */
         fun cacheNetWorkTimeOut(time: Int): Builder {
-            HttpConfig.cacheNetworkTimeOut = time
+            httpConfig.cacheNetworkTimeOut = time
             return this
         }
 
@@ -149,7 +166,7 @@ class RxHttp {
          * [time] 单位 秒
          */
         fun cacheNoNetWorkTimeOut(time: Int): Builder {
-            HttpConfig.cacheNoNetworkTimeOut = time
+            httpConfig.cacheNoNetworkTimeOut = time
             return this
         }
 
@@ -158,7 +175,7 @@ class RxHttp {
          * [size] 单位 byte
          */
         fun cacheSize(size: Int): Builder {
-            HttpConfig.cacheSize = size
+            httpConfig.cacheSize = size
             return this
         }
 
@@ -167,7 +184,7 @@ class RxHttp {
          * 默认位置 沙盒位置/cacheHttp
          */
         fun cachePath(path: String): Builder {
-            HttpConfig.cachePath = path
+            httpConfig.cachePath = path
             return this
         }
 
@@ -177,31 +194,31 @@ class RxHttp {
         fun cacheType(type: CacheType): Builder {
             when (type) {
                 CacheType.HAS_NETWORK_NOCACHE_AND_NO_NETWORK_NO_TIME -> {
-                    HttpConfig.cacheNetWorkType = HttpNetWorkType.NOCACHE
-                    HttpConfig.cacheNoNewWorkType = HttpCacheType.NO_TIMEOUT
+                    httpConfig.cacheNetWorkType = HttpNetWorkType.NOCACHE
+                    httpConfig.cacheNoNewWorkType = HttpCacheType.NO_TIMEOUT
                 }
                 CacheType.HAS_NETWORK_CACHE_TIME_AND_NO_NETWORK_NO_TIME -> {
-                    HttpConfig.cacheNetWorkType = HttpNetWorkType.CACHE_TIME
-                    HttpConfig.cacheNoNewWorkType = HttpCacheType.NO_TIMEOUT
+                    httpConfig.cacheNetWorkType = HttpNetWorkType.CACHE_TIME
+                    httpConfig.cacheNoNewWorkType = HttpCacheType.NO_TIMEOUT
                 }
                 CacheType.HAS_NETWORK_NOCACHE_AND_NO_NETWORK_HAS_TIME -> {
-                    HttpConfig.cacheNetWorkType = HttpNetWorkType.NOCACHE
-                    HttpConfig.cacheNoNewWorkType = HttpCacheType.HAS_TIMEOUT
+                    httpConfig.cacheNetWorkType = HttpNetWorkType.NOCACHE
+                    httpConfig.cacheNoNewWorkType = HttpCacheType.HAS_TIMEOUT
                 }
                 CacheType.HAS_NETWORK_CACHE_TIME_AND_NO_NETWORK_HAS_TIME -> {
-                    HttpConfig.cacheNetWorkType = HttpNetWorkType.CACHE_TIME
-                    HttpConfig.cacheNoNewWorkType = HttpCacheType.HAS_TIMEOUT
+                    httpConfig.cacheNetWorkType = HttpNetWorkType.CACHE_TIME
+                    httpConfig.cacheNoNewWorkType = HttpCacheType.HAS_TIMEOUT
                 }
                 CacheType.NONE -> {
-                    HttpConfig.cacheNetWorkType = HttpNetWorkType.NONE
-                    HttpConfig.cacheNoNewWorkType = HttpCacheType.NONE
+                    httpConfig.cacheNetWorkType = HttpNetWorkType.NONE
+                    httpConfig.cacheNoNewWorkType = HttpCacheType.NONE
                 }
             }
             return this
         }
 
         fun build(context: Context): RxHttp {
-            HttpManager.create().build(context)
+            HttpManager.create(httpConfig).build(context)
             return RxHttp()
         }
     }
@@ -210,6 +227,14 @@ class RxHttp {
     //创建一个新的请求
     fun create(): RequestBuilder {
         return RequestBuilder()
+    }
+
+    /***
+     * 传入自己定义的 接口
+     * [tClass] class, 提供了默认的 [ApiService],不满足需求可使用这个方法自行定义
+     */
+    fun <T> getService(tClass: Class<T>): T {
+        return HttpManager.getService(tClass)
     }
 }
 

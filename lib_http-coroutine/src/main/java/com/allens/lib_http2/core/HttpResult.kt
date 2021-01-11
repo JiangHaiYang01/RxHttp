@@ -15,24 +15,37 @@ sealed class HttpResult<out T : Any> {
         }
     }
 
+
+    fun doSuccess(action: (T) -> Unit): HttpResult<T> {
+        if (this is Success) {
+            action(data)
+        }
+        return this
+    }
+
+    fun doFailed(action: (Throwable) -> Unit): HttpResult<T> {
+        if (this is Error) {
+            action(throwable)
+        }
+        return this
+    }
+
     suspend inline fun result(
         crossinline success: (T) -> Unit,
-        crossinline error: (Throwable) -> Unit
+        crossinline failed: (Throwable) -> Unit
     ) {
         when (this) {
             is Success -> {
-                withContext(Dispatchers.Main){
+                withContext(Dispatchers.Main) {
                     success(data)
                 }
 
             }
             is Error -> {
-                withContext(Dispatchers.Main){
-                    error(throwable)
+                withContext(Dispatchers.Main) {
+                    failed(throwable)
                 }
             }
         }
-
-
     }
 }

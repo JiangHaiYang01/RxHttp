@@ -1,8 +1,6 @@
 package com.allens.rxhttp
 
-import android.content.Context
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -17,7 +15,6 @@ import kotlinx.android.synthetic.main.activity_dowload.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import java.io.File
 
 
 class DownLoadAct : AppCompatActivity(), CoroutineScope by MainScope(),
@@ -37,7 +34,7 @@ class DownLoadAct : AppCompatActivity(), CoroutineScope by MainScope(),
 
         rxHttp = RxHttp.Builder()
             .baseUrl("https://www.wanandroid.com")
-            .isLog(true)
+            .isDebug(true)
             .level(HttpLevel.BODY)
             .writeTimeout(10)
             .readTimeout(10)

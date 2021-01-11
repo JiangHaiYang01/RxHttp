@@ -7,4 +7,5 @@
     <string name="param_change_base_url">动态切换BaseURL</string>
     <string name="param_form">表单</string>
     <string name="param_change_time_out">切换超时时间</string>
+    <string name="param_custom_api">自定义接口</string>
 </resources>

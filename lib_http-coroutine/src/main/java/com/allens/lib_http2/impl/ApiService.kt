@@ -15,6 +15,13 @@ import retrofit2.http.*
  * @Version:        1.0
  */
 interface ApiService {
+
+    @GET
+    suspend fun <T>doGetTest(
+        @HeaderMap headers: HashMap<String, String>,
+        @Url url: String
+    ): Response<T>
+
     @GET
     suspend fun doGet(
         @HeaderMap headers: HashMap<String, String>,

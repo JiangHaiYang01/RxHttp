@@ -125,16 +125,14 @@ object DownLoadManager {
                 .downloadFile("bytes=$currentLength-", url)
             val responseBody = response.body()
             if (responseBody == null) {
-                if (HttpConfig.isLog) {
-                    RxHttpLogTool.i( "responseBody is null")
-                    withContext(Dispatchers.Main) {
-                        loadListener.onDownLoadError(
-                            key = tag,
-                            throwable = Throwable("responseBody is null please check download url")
-                        )
-                    }
-                    DownLoadPool.remove(tag)
+                RxHttpLogTool.i( "responseBody is null")
+                withContext(Dispatchers.Main) {
+                    loadListener.onDownLoadError(
+                        key = tag,
+                        throwable = Throwable("responseBody is null please check download url")
+                    )
                 }
+                DownLoadPool.remove(tag)
                 return
             }
 

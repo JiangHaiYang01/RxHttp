@@ -1,10 +1,12 @@
 package com.allens.lib_http2.config
 
-import com.allens.lib_http2.impl.OnFactoryListener
 import com.allens.lib_http2.impl.OnCookieInterceptor
 import com.allens.lib_http2.impl.OnLogInterceptorListener
 import com.allens.lib_http2.interceptor.OnCookieListener
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.CallAdapter
+import retrofit2.Converter
+import java.util.concurrent.TimeUnit
 
 /**
  *
@@ -14,39 +16,45 @@ import okhttp3.logging.HttpLoggingInterceptor
  * @Version:        1.0
  */
 
-open class HttpConfig {
-    companion object {
-        var baseUrl: String = ""
-        var connectTime: Long = 10
-        var readTime: Long = 10
-        var writeTime: Long = 10
+class HttpConfig {
+    var baseUrl: String = ""
+    var connectTime: Long = 10
+    var connectTimeTimeUnit = TimeUnit.SECONDS
+    var readTime: Long = 10
+    var readTimeTimeUnit = TimeUnit.SECONDS
+    var writeTime: Long = 10
+    var writeTimeTimeUnit = TimeUnit.SECONDS
 
-        var retryOnConnectionFailure: Boolean = false
+    var retryOnConnectionFailure: Boolean = false
 
-        var isLog: Boolean = true
-        var level: HttpLevel = HttpLevel.BODY
-        var logListener: OnLogInterceptorListener? = null
-
-
-        var onFactoryListener: OnFactoryListener? = null
-        var cookieListener: OnCookieListener? = null
-        var onCookieInterceptor: OnCookieInterceptor? = null
-        var heardMap: Map<String, String>? = null
+    var level: HttpLevel = HttpLevel.BODY
+    var logSet = mutableSetOf<OnLogInterceptorListener>()
 
 
-        //有网时候的缓存策略 默认无缓存策略
-        var cacheNetWorkType = HttpNetWorkType.NONE
-        //无网时候的缓存策略 默认无缓存策略
-        var cacheNoNewWorkType = HttpCacheType.NONE
-        //有网时:特定时间之后请求数据；（比如：特定时间为20s） 默认20
-        var cacheNetworkTimeOut = 20
-        //无网时:特定时间之前请求有网请求好的数据；（（比如：特定时间为30天） 默认30 天  单位（秒）
-        var cacheNoNetworkTimeOut = 30 * 24 * 60 * 60
-        //缓存大小  10M
-        var cacheSize = 10 * 1024 * 1024
-        //缓存位置
-        var cachePath = ""
-    }
+    var cookieSet  = mutableSetOf<OnCookieInterceptor>()
+    var heardMap: HashMap<String, String> = HashMap()
+
+    var converterFactorySet = mutableSetOf<Converter.Factory>()
+    var callAdapterFactorySet = mutableSetOf<CallAdapter.Factory>()
+
+
+    //有网时候的缓存策略 默认无缓存策略
+    var cacheNetWorkType = HttpNetWorkType.NONE
+
+    //无网时候的缓存策略 默认无缓存策略
+    var cacheNoNewWorkType = HttpCacheType.NONE
+
+    //有网时:特定时间之后请求数据；（比如：特定时间为20s） 默认20
+    var cacheNetworkTimeOut = 20
+
+    //无网时:特定时间之前请求有网请求好的数据；（（比如：特定时间为30天） 默认30 天  单位（秒）
+    var cacheNoNetworkTimeOut = 30 * 24 * 60 * 60
+
+    //缓存大小  10M
+    var cacheSize = 10 * 1024 * 1024
+
+    //缓存位置
+    var cachePath = ""
 }
 
 enum class HttpLevel {
@@ -71,12 +79,16 @@ enum class HttpLevel {
 enum class CacheType {
     //不加入缓存的逻辑
     NONE,
+
     //有网时:每次都请求实时数据； 无网时:无限时请求有网请求好的数据；
     HAS_NETWORK_NOCACHE_AND_NO_NETWORK_NO_TIME,
+
     //有网时:特定时间之后请求数据； 无网时:无限时请求有网请求好的数据；
     HAS_NETWORK_CACHE_TIME_AND_NO_NETWORK_NO_TIME,
+
     //有网时:每次都请求实时数据； 无网时:特定时间之前请求有网请求好的数据；
     HAS_NETWORK_NOCACHE_AND_NO_NETWORK_HAS_TIME,
+
     //有网时:特定时间之后请求数据； 无网时:特定时间之前请求有网请求好的数据；
     HAS_NETWORK_CACHE_TIME_AND_NO_NETWORK_HAS_TIME,
 }
@@ -84,8 +96,10 @@ enum class CacheType {
 enum class HttpNetWorkType {
     //不加入缓存的逻辑
     NONE,
+
     //有网络时候 实时加载
     NOCACHE,
+
     //特定时间之后请求数据；（比如：特定时间为20s）
     CACHE_TIME,
 }
@@ -94,8 +108,10 @@ enum class HttpNetWorkType {
 enum class HttpCacheType {
     //不加入缓存的逻辑
     NONE,
+
     //无限时请求有网请求好的数据；
     NO_TIMEOUT,
+
     //特定时间之前请求有网请求好的数据；（（比如：特定时间为20s））
     HAS_TIMEOUT,
 }

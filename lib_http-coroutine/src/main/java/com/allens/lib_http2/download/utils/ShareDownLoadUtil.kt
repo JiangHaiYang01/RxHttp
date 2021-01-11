@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
 import com.allens.lib_http2.manager.HttpManager
+import com.allens.lib_http2.tools.DynamicHeard
 
 /**
  *
@@ -12,7 +13,7 @@ import com.allens.lib_http2.manager.HttpManager
 object ShareDownLoadUtil {
 
 
-    private var path = Build.BRAND + "_" + Build.MODEL + "_" + "download_sp"
+    private var path = DynamicHeard.TODO_HEARD + "download_sp"
     private val sp: SharedPreferences
 
 

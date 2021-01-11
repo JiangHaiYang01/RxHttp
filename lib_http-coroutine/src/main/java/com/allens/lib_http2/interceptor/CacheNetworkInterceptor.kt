@@ -1,7 +1,5 @@
 package com.allens.lib_http2.interceptor
 
-import android.util.Log
-import com.allens.lib_http2.RxHttp
 import com.allens.lib_http2.config.HttpConfig
 import com.allens.lib_http2.config.HttpNetWorkType
 import com.allens.lib_http2.tools.RxHttpLogTool
@@ -21,14 +19,14 @@ import okhttp3.Response
  * @UpdateRemark:    更新说明
  * @Version:         1.0
  */
-internal class CacheNetworkInterceptor : Interceptor {
+internal class CacheNetworkInterceptor(private val httpConfig: HttpConfig) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        val time = when (HttpConfig.cacheNetWorkType) {
+        val time = when (httpConfig.cacheNetWorkType) {
             HttpNetWorkType.NOCACHE -> {
                 0
             }
             HttpNetWorkType.CACHE_TIME -> {
-                HttpConfig.cacheNetworkTimeOut
+                httpConfig.cacheNetworkTimeOut
             }
             else -> {
                 0

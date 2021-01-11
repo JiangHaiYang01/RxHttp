@@ -6,4 +6,7 @@ interface  OnCookieInterceptor {
 
     //拦截哪一个方法
     fun isInterceptorRequest(url: String): Boolean
+
+    //拦截返回
+    fun onCookies(cookie: HashSet<String>)
 }

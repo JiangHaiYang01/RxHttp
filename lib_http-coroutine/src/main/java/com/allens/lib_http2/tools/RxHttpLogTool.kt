@@ -6,9 +6,10 @@ import com.allens.lib_http2.config.HttpConfig
 
 object RxHttpLogTool {
 
-    fun i( info: String) {
-        if (HttpConfig.isLog) {
+    fun i(info: String) {
+        if (RxHttp.isDebug) {
             Log.i(RxHttp.TAG, info)
         }
+
     }
 }

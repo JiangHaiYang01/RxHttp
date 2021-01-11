@@ -1,6 +1,5 @@
 package com.allens.lib_http2.interceptor
 
-import com.allens.lib_http2.RxHttp
 import com.allens.lib_http2.config.HttpConfig
 import com.allens.lib_http2.config.HttpLevel
 import com.allens.lib_http2.manager.HttpManager
@@ -17,18 +16,18 @@ import okhttp3.logging.HttpLoggingInterceptor
 
 //日志拦截器
 object LogInterceptor {
-    fun register(level: HttpLevel): HttpLoggingInterceptor {
+    fun register(httpConfig: HttpConfig): HttpLoggingInterceptor {
         val interceptor = HttpLoggingInterceptor(object : HttpLoggingInterceptor.Logger {
             override fun log(message: String) {
-                RxHttpLogTool.i("http----> $message ")
-                if (HttpConfig.isLog) {
-                    HttpManager.handler.post {
-                        HttpConfig.logListener?.onLogInterceptorInfo(message)
+                RxHttpLogTool.i(message)
+                HttpManager.handler.post {
+                    httpConfig.logSet.forEach {
+                        it.onLogInterceptorInfo(message)
                     }
                 }
             }
         })
-        interceptor.level = HttpLevel.conversion(level)
+        interceptor.level = HttpLevel.conversion(httpConfig.level)
         return interceptor
     }
 }

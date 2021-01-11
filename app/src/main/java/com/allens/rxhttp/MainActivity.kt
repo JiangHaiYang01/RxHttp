@@ -3,186 +3,219 @@ package com.allens.rxhttp
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.method.ScrollingMovementMethod
-import android.util.Log
+import android.widget.Button
 import com.allens.lib_http2.RxHttp
 import com.allens.lib_http2.config.HttpLevel
-import com.allens.lib_http2.impl.OnFactoryListener
-import com.allens.lib_http2.impl.OnLogInterceptorListener
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
-import retrofit2.CallAdapter
-import retrofit2.Converter
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
-class MainActivity : AppCompatActivity(), CoroutineScope by MainScope(),
-    OnLogInterceptorListener {
+class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
 
     companion object {
         const val TAG = "Main"
     }
 
-    private lateinit var rxHttp: RxHttp
+    private fun getBaseUrl(): String {
+        return "https://www.wanandroid.com"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        log.movementMethod = ScrollingMovementMethod.getInstance()
+        linear.addView(Button(this).apply {
+            text = "日志"
+            setOnClickListener {
+                doLog()
+            }
+        })
 
-        //初始化
-        rxHttp = RxHttp.Builder()
-            .baseUrl("https://www.wanandroid.com") //base url
-            .isLog(true)  //是否打印log
-            .level(HttpLevel.BODY)      //日志级别
-            .addLogInterceptorListener(this) //日志拦截器的日志信息
-            .writeTimeout(10)  //超时
-            .readTimeout(10)
-            .connectTimeout(10)
-            .retryOnConnectionFailure(true)//是否重试
-            .addFactoryListener(object : OnFactoryListener {
-                //添加自定义的 Converter.Factory
-                override fun addConverterFactory(): MutableSet<Converter.Factory> {
-                    return mutableSetOf(
-                        GsonConverterFactory.create()
-                    )
-                }
+        linear.addView(Button(this).apply {
+            text = "GET请求"
+            setOnClickListener {
+                doGet()
+            }
+        })
 
-                override fun addCallAdapterFactory(): MutableSet<CallAdapter.Factory>? {//添加自定义的 CallAdapter.Factory
-                    return mutableSetOf(
-                        RxJava2CallAdapterFactory.create()
-                    )
-                }
-            })
-            .build(this)
+        linear.addView(Button(this).apply {
+            text = "表单请求"
+            setOnClickListener {
+                doForm()
+            }
+        })
 
-        btn_get.setOnClickListener {
-            log.text = ""
-            getRequest()
-        }
-        btn_form.setOnClickListener {
-            log.text = ""
-            formRequest()
-        }
-        btn_post.setOnClickListener {
-            log.text = ""
-            postRequest()
-        }
+        linear.addView(Button(this).apply {
+            text = "Post请求"
+            setOnClickListener {
+                doPOST()
+            }
+        })
+
+        linear.addView(Button(this).apply {
+            text = "修改单个请求BaseUrl"
+            setOnClickListener {
+                doChangeBaseUrl()
+            }
+        })
+
+        linear.addView(Button(this).apply {
+            text = "修改单个请求连接超时"
+            setOnClickListener {
+                doChangeConnectTimeOut()
+            }
+        })
+
+        linear.addView(Button(this).apply {
+            text = "为所有请求添加请求头"
+            setOnClickListener {
+                doAddHeard()
+            }
+        })
 
 
-        btn_download.setOnClickListener {
-            startActivity(Intent(this, DownLoadAct::class.java))
-        }
-        btn_upload.setOnClickListener {
-            startActivity(Intent(this, UploadAct::class.java))
-        }
+        linear.addView(Button(this).apply {
+            text = "下载"
+            setOnClickListener {
+                startActivity(Intent(this@MainActivity,DownLoadAct::class.java))
+            }
+        })
 
-        btn_change_base_url.setOnClickListener {
-            log.text = ""
-            changeUrlRequest()
-        }
+        linear.addView(Button(this).apply {
+            text = "上传"
+            setOnClickListener {
+                startActivity(Intent(this@MainActivity,UploadAct::class.java))
+            }
+        })
+    }
 
-        btn_change_time_out.setOnClickListener {
-            log.text = ""
-            changeTimeOutRequest()
+    private fun doAddHeard(){
+        launch {
+            val rxHttp = RxHttp.Builder()
+                .baseUrl(getBaseUrl()) //base url
+                .isDebug(true)  //是否打印log
+                .addHead("name","allens")//为所有请求添加请求头
+                .level(HttpLevel.BODY)
+                .build(this@MainActivity)
+            rxHttp.create()
+                .doBody("lg/collect/add/json", TestBean::class.java)
+                .doSuccess { println("success") }
+                .doFailed { println("failed " + it.message) }
+
+            rxHttp.create()
+                .doBody("lg/collect/add/json", TestBean::class.java)
+                .doSuccess { println("success") }
+                .doFailed { println("failed " + it.message) }
+            println("finish")
         }
     }
 
-    private fun formRequest() {
+    private fun doLog() {
         launch {
-            rxHttp
-                .create()
+            val rxHttp = RxHttp.Builder()
+                .baseUrl(getBaseUrl()) //base url
+                .isDebug(true)  //是否打印log
+                .addLogInterceptor(MyLog())
+                .level(HttpLevel.BODY)
+                .build(this@MainActivity)
+            rxHttp.create()
+                .addParameter("link", "123456")
+                .doBody("lg/collect/add/json", TestBean::class.java)
+                .doSuccess { println("success") }
+                .doFailed { println("failed " + it.message) }
+            println("finish")
+        }
+    }
+
+    private fun doChangeConnectTimeOut() {
+        launch {
+            val rxHttp = RxHttp.Builder()
+                .baseUrl(getBaseUrl()) //base url
+                .isDebug(true)  //是否打印log
+                .build(this@MainActivity)
+            rxHttp.create()
+                .addParameter("link", "123456")
+                .dynamicConnectTimeOut(1,TimeUnit.MILLISECONDS)
+                .dynamicWriteTimeOut(1,TimeUnit.MILLISECONDS)
+                .dynamicReadTimeOut(1,TimeUnit.MILLISECONDS)
+                .doBody("lg/collect/add/json", TestBean::class.java)
+                .doSuccess { println("success") }
+                .doFailed { println("failed " + it.message) }
+            println("finish")
+        }
+    }
+
+    private fun doChangeBaseUrl() {
+        launch {
+            val rxHttp = RxHttp.Builder()
+                .baseUrl(getBaseUrl()) //base url
+                .isDebug(true)  //是否打印log
+                .build(this@MainActivity)
+
+            rxHttp.create()
+                .addParameter("link", "123456")
+                .dynamicBaseUrl("http://localhost")
+                .doBody("lg/collect/add/json", TestBean::class.java)
+                .doSuccess { println("success") }
+                .doFailed { println("failed " + it.message) }
+            println("finish")
+        }
+    }
+
+    private fun doPOST(){
+        launch {
+            //初始化
+            val rxHttp = RxHttp.Builder()
+                .baseUrl(getBaseUrl()) //base url
+                .build(this@MainActivity)
+
+            rxHttp.create()
+                .addParameter("title", "123456")
+                .addParameter("author", "123456")
+                .addParameter("link", "123456")
+                .doBody("lg/collect/add/json", TestBean::class.java)
+                .doSuccess { println("success") }
+                .doFailed { println("failed " + it.message) }
+            println("finish")
+        }
+    }
+
+    private fun doForm() {
+        launch {
+            //初始化
+            val rxHttp = RxHttp.Builder()
+                .baseUrl(getBaseUrl()) //base url
+                .build(this@MainActivity)
+
+            rxHttp.create()
                 .addParameter("title", "123456")
                 .addParameter("author", "123456")
                 .addParameter("link", "123456")
                 .doPost("lg/collect/add/json", TestBean::class.java)
-                .result(
-                    {
-//                        log.text = it.toString()
-                    },
-                    {
-//                        log.text = it.message.toString()
-                    }
-                )
+                .doSuccess { println("success") }
+                .doFailed { println("failed " + it.message) }
+            println("finish")
         }
     }
 
-    private fun postRequest() {
+
+    private fun doGet() {
         launch {
-            rxHttp
-                .create()
-                .addParameter("title", "123456")
-                .addParameter("author", "123456")
-                .addParameter("link", "123456")
-                .doBody("lg/collect/add/json", TestBean::class.java)
-                .result(
-                    {
-//                        log.text = it.toString()
-                    },
-                    {
-//                        log.text = it.message.toString()
-                    }
-                )
+            //初始化
+            val rxHttp = RxHttp.Builder()
+                .baseUrl(getBaseUrl()) //base url
+                .isDebug(true)  //是否打印log
+                .build(this@MainActivity)
+
+            rxHttp.create()
+//                .addParameter("firstName", "江")
+//                .addParameter("lastName", "海洋")
+//                .addHeard("heardFirst", "hello")
+//                .addHeard("heardLast", "world")
+                .doGet("wxarticle/chapters/json", TestBean::class.java)
+                .doSuccess { println("success") }
+                .doFailed { println("failed " + it.message) }
+            println("finish")
         }
-    }
-
-    private fun changeUrlRequest() {
-        launch {
-            rxHttp
-                .create()
-                .dynamicBaseUrl("http://localhost")
-                .addParameter("k", "java")
-                .doGet(parameter = "wxarticle/chapters/json", tClass = TestBean::class.java)
-                .result({
-                    Log.i(TAG, "success ${Thread.currentThread().name} info $it ")
-//                    log.text = it.toString()
-                }, {
-                    Log.i(TAG, "error ${Thread.currentThread().name} info ${it.toString()} ")
-//                    log.text = it.toString()
-                })
-        }
-    }
-
-    private fun changeTimeOutRequest() {
-        launch {
-            rxHttp
-                .create()
-                .dynamicConnectTimeOut(10)
-                .dynamicReadTimeOut(10)
-                .dynamicWriteTimeOut(10)
-                .addParameter("title", "123456")
-                .addParameter("author", "123456")
-                .addParameter("link", "123456")
-                .doBody("lg/collect/add/json", TestBean::class.java)
-                .result(
-                    {
-//                        log.text = it.toString()
-                    },
-                    {
-//                        log.text = it.message.toString()
-                    }
-                )
-        }
-    }
-
-
-    private fun getRequest() {
-        launch {
-            rxHttp
-                .create()
-                .addParameter("k", "java")
-                .doGet(parameter = "wxarticle/chapters/json", tClass = TestBean::class.java)
-                .result({
-                    Log.i(TAG, "success ${Thread.currentThread().name} info $it ")
-//                    log.text = it.toString()
-                }, {
-                    Log.i(TAG, "error ${Thread.currentThread().name} info ${it.toString()} ")
-//                    log.text = it.toString()
-                })
-        }
-    }
-
-    override fun onLogInterceptorInfo(message: String) {
-        log.append(message + "\n")
     }
 }

@@ -1,8 +1,5 @@
 package com.allens.lib_http2.interceptor
 
-import android.util.Log
-import com.allens.lib_http2.RxHttp
-import com.allens.lib_http2.config.HttpConfig
 import com.allens.lib_http2.tools.RxHttpLogTool
 import okhttp3.Interceptor
 import okhttp3.Request
@@ -14,7 +11,7 @@ object HeardInterceptor {
             val request = chain.request()
             val builder: Request.Builder = request.newBuilder()
             for ((key, value) in map.entries) {
-                RxHttpLogTool.i( "http----> add heard [key]:$key [value]:$value ")
+                RxHttpLogTool.i( "add heard [key]:$key [value]:$value ")
                 builder.addHeader(key, value)
             }
             chain.proceed(builder.build())
