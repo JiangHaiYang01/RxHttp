@@ -3,7 +3,6 @@ package com.allens.lib_http2
 import android.content.Context
 import com.allens.lib_http2.config.*
 import com.allens.lib_http2.impl.*
-import com.allens.lib_http2.interceptor.OnCookieListener
 import com.allens.lib_http2.manager.HttpManager
 import com.allens.lib_http2.tools.RequestBuilder
 import retrofit2.CallAdapter

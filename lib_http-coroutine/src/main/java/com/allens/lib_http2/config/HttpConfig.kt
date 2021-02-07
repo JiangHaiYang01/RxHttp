@@ -2,7 +2,6 @@ package com.allens.lib_http2.config
 
 import com.allens.lib_http2.impl.OnCookieInterceptor
 import com.allens.lib_http2.impl.OnLogInterceptorListener
-import com.allens.lib_http2.interceptor.OnCookieListener
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.CallAdapter
 import retrofit2.Converter
